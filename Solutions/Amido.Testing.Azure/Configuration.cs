@@ -4,8 +4,14 @@ using Microsoft.WindowsAzure.ServiceRuntime;
 
 namespace Amido.Testing.Azure
 {
+    /// <summary>
+    /// Helper class for azure configuration.
+    /// </summary>
     public static class Configuration
     {
+        /// <summary>
+        /// SetConfigurationSettingPublisher.
+        /// </summary>
         public static void SetConfigurationSettingPublisher()
         {
             CloudStorageAccount.SetConfigurationSettingPublisher((configName, configSetter) =>

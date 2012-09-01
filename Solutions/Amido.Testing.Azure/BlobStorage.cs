@@ -7,8 +7,15 @@ using Amido.Testing.Dbc;
 
 namespace Amido.Testing.Azure
 {
+    /// <summary>
+    /// Helper class for Azure blob storage.
+    /// </summary>
     public static class BlobStorage
     {
+        /// <summary>
+        /// Copies a blob from one account and container to another.
+        /// </summary>
+        /// <param name="copyBlockBlobSettings">A <see cref="CopyBlockBlobSettings"/>.</param>
         public static void CopyBlockBlob(CopyBlockBlobSettings copyBlockBlobSettings)
         {
             Contract.Requires(copyBlockBlobSettings != null, "The copy block blob settings cannot be null.");
@@ -43,6 +50,10 @@ namespace Amido.Testing.Azure
             }
         }
 
+        /// <summary>
+        /// Deletes a container.
+        /// </summary>
+        /// <param name="deleteContainerSettings">A <see cref="DeleteContainerSettings"/>.</param>
         public static void DeleteContainer(DeleteContainerSettings deleteContainerSettings)
         {
             Contract.Requires(deleteContainerSettings != null, "The delete container settings cannot be null.");
