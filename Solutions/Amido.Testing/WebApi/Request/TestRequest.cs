@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.WebTesting;
 
 namespace Amido.Testing.WebApi.Request
 {
-    public class TestRequest
+    internal class TestRequest
     {
         public Func<WebTestRequest> Request { get; set; }
         public Func<ValidationRule>[] Asserts { get; set; }

@@ -1,20 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using Amido.Testing.WebApi.Request;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Microsoft.VisualStudio.TestTools.WebTesting;
 using Amido.Testing.WebApi.ValidationRules;
 using System.Threading;
 
 namespace Amido.Testing.WebApi
 {
+    /// <summary>
+    /// Base class required for using the Amido.Testing.WebApi helpers.
+    /// </summary>
     public abstract class WebApiTestBase : WebTest
     {
+        #region Declarations
+
         private TestRequests testRequests;
         private WebTestRequest currentRequest;
         private TestRequest currentTestRequest;
-        private Outcome currentWebTestOutcome;
+        private Outcome currentWebTestOutcome; 
 
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Returns a new <see cref="TestTasks"/> collection for storing and running a multithreaded list of tasks.
+        /// </summary>
         public TestTasks TestTasks
         {
             get
@@ -23,50 +34,59 @@ namespace Amido.Testing.WebApi
             }
         }
 
+        /// <summary>
+        /// Returns a new <see cref="TestRequests"/> collection for storing web api request actions.
+        /// </summary>
         public TestRequests Requests
         {
             get
-            { 
-                testRequests =  new TestRequests();
+            {
+                testRequests = new TestRequests();
                 return testRequests;
             }
-        }
+        } 
 
+        #endregion
+
+        #region Constructor
+        
         protected WebApiTestBase()
         {
             PreWebTest += OnPreWebTest;
             PostWebTest += OnPostWebTest;
-        }
+        } 
 
-        private void OnPreWebTest(object sender, PreWebTestEventArgs preWebTestEventArgs)
+        #endregion
+
+        #region Start and clean up
+
+        /// <summary>
+        /// Start up tasks, tasks are run in the pre web test event.
+        /// </summary>
+        public virtual void StartUp()
         {
-            try
-            {
-                StartUp();
-            }
-            catch (Exception)
-            {
-                preWebTestEventArgs.WebTest.Outcome = Outcome.Fail;
-                preWebTestEventArgs.WebTest.AddCommentToResult("Startup failed.");
-            }
-            
         }
 
-        private void OnPostWebTest(object sender, PostWebTestEventArgs postWebTestEventArgs)
+        /// <summary>
+        /// Clean up tasks, tasks are run in the post web test event.
+        /// </summary>
+        public virtual void CleanUp()
         {
-            try
-            {
-                CleanUp();
-            }
-            catch (Exception)
-            {
-                postWebTestEventArgs.WebTest.Outcome = Outcome.Fail;
-                postWebTestEventArgs.WebTest.AddCommentToResult("Cleanup failed.");
-            }
-        }
+        } 
 
+        #endregion
+
+        #region Web Test Requests
+
+        /// <summary>
+        /// Web Test Requests.
+        /// </summary>
         public abstract void WebTestRequests();
 
+        /// <summary>
+        /// Main Enumerator for the <see cref="WebTest"/>.
+        /// </summary>
+        /// <returns></returns>
         public override IEnumerator<WebTestRequest> GetRequestEnumerator()
         {
             WebTestRequests();
@@ -85,7 +105,7 @@ namespace Amido.Testing.WebApi
 
                 if (testRequest.MaxRetries == 0)
                 {
-                    if(testRequest.WaitPeriod > 0)
+                    if (testRequest.WaitPeriod > 0)
                     {
                         Thread.Sleep(testRequest.WaitPeriod);
                     }
@@ -95,7 +115,7 @@ namespace Amido.Testing.WebApi
                 {
                     currentRequest.PostRequest += CurrentRequestOnPostRequest;
 
-                    for(var i = 0; i <= testRequest.MaxRetries; i++)
+                    for (var i = 0; i <= testRequest.MaxRetries; i++)
                     {
                         //TestValidateRetry(testRequest, i);
 
@@ -118,10 +138,41 @@ namespace Amido.Testing.WebApi
                         {
                             break;
                         }
-                        
+
                         Thread.Sleep(testRequest.Interval);
                     }
                 }
+            }
+        } 
+
+        #endregion
+
+        #region Test Helpers
+
+        private void OnPreWebTest(object sender, PreWebTestEventArgs preWebTestEventArgs)
+        {
+            try
+            {
+                StartUp();
+            }
+            catch (Exception)
+            {
+                preWebTestEventArgs.WebTest.Outcome = Outcome.Fail;
+                preWebTestEventArgs.WebTest.AddCommentToResult("Startup failed.");
+            }
+
+        }
+
+        private void OnPostWebTest(object sender, PostWebTestEventArgs postWebTestEventArgs)
+        {
+            try
+            {
+                CleanUp();
+            }
+            catch (Exception)
+            {
+                postWebTestEventArgs.WebTest.Outcome = Outcome.Fail;
+                postWebTestEventArgs.WebTest.AddCommentToResult("Cleanup failed.");
             }
         }
 
@@ -132,16 +183,6 @@ namespace Amido.Testing.WebApi
                 postRequestEventArgs.WebTest.Outcome = Outcome.Pass;
             }
         }
-
-        public virtual void StartUp()
-        {
-        }
-
-        public virtual void CleanUp()
-        {
-        }
-
-        #region Test Helpers
 
         private void TestValidateRetry(TestRequest testRequest, int i)
         {

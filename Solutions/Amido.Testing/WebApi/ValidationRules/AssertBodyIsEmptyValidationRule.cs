@@ -2,9 +2,17 @@
 using Microsoft.VisualStudio.TestTools.WebTesting;
 namespace Amido.Testing.WebApi.ValidationRules
 {
+    /// <summary>
+    /// Assert Body Is Empty.
+    /// </summary>
     [DisplayName("Assert Body Is Empty")]
     public class AssertBodyIsEmptyValidationRule : ValidationRule
     {
+        /// <summary>
+        /// The validate method.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="ValidationEventArgs"/></param>
         public override void Validate(object sender, ValidationEventArgs e)
         {
             if (e.Response.IsBodyEmpty)

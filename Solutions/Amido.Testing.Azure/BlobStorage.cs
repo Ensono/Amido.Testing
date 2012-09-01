@@ -37,7 +37,7 @@ namespace Amido.Testing.Azure
             {
                 destinationBlob.StartCopyFromBlob(sourceBlob.Uri);
             }
-            catch (StorageClientException ex)
+            catch (StorageClientException)
             {
                 throw;
             }
@@ -56,7 +56,7 @@ namespace Amido.Testing.Azure
             {
                 blobContainer.Delete(AccessCondition.GenerateEmptyCondition(), null);
             }
-            catch (StorageClientException ex)
+            catch (StorageClientException)
             {
                 throw;
             }

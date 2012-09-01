@@ -4,18 +4,31 @@ using Microsoft.VisualStudio.TestTools.WebTesting;
 
 namespace Amido.Testing.WebApi.ValidationRules
 {
+    /// <summary>
+    /// The retry assertion rules.
+    /// </summary>
     [DisplayName("Assert Retry")]
     internal class AssertRetryValidationRule : ValidationRule
     {
         private readonly RetryTestType retryTestType;
         private readonly string expectedValue;
 
+        /// <summary>
+        /// Constructs the <see cref="ValidationRule"/>.
+        /// </summary>
+        /// <param name="retryTestType">The <see cref="RetryTestType"/>.</param>
+        /// <param name="expectedValue">The expected value.</param>
         public AssertRetryValidationRule(RetryTestType retryTestType, string expectedValue)
         {
             this.retryTestType = retryTestType;
             this.expectedValue = expectedValue;
         }
 
+        /// <summary>
+        /// The validate method.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="ValidationEventArgs"/></param>
         public override void Validate(object sender, ValidationEventArgs e)
         {
             switch (retryTestType)

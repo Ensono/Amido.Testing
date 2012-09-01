@@ -4,11 +4,18 @@ using Microsoft.VisualStudio.TestTools.WebTesting;
 
 namespace Amido.Testing.WebApi.ValidationRules
 {
+    /// <summary>
+    /// Assert Body Equals Value.
+    /// </summary>
     [DisplayName("Assert Body Equals Value")]
     public class AssertBodyEqualsValidationRule : ValidationRule
     {
         private readonly string expectedBody;
 
+        /// <summary>
+        /// Constructs the <see cref="ValidationRule"/>.
+        /// </summary>
+        /// <param name="expectedBody">The expected response body.</param>
         public AssertBodyEqualsValidationRule(string expectedBody)
         {
             Contract.Requires(!string.IsNullOrWhiteSpace(expectedBody), "The expected body cannot be null or empty.");
@@ -16,6 +23,11 @@ namespace Amido.Testing.WebApi.ValidationRules
             this.expectedBody = expectedBody;
         }
 
+        /// <summary>
+        /// The validate method.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="ValidationEventArgs"/></param>
         public override void Validate(object sender, ValidationEventArgs e)
         {
             if (expectedBody == e.Response.BodyString)
