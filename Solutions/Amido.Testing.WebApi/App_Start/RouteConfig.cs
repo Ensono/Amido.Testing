@@ -19,6 +19,7 @@ namespace Amido.Testing.WebApi
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
+
         }
 
         public static void RegisterRoutes(HttpRouteCollection routes)

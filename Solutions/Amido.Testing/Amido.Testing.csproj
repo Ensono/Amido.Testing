@@ -59,6 +59,7 @@
     <Compile Include="WebApi\Request\TestRequest.cs" />
     <Compile Include="WebApi\Request\TestRequests.cs" />
     <Compile Include="WebApi\Request\TestTasks.cs" />
+    <Compile Include="WebApi\Routing\RouteData.cs" />
     <Compile Include="WebApi\Routing\RouteTest.cs" />
     <Compile Include="WebApi\Routing\RouteTestAssertions.cs" />
     <Compile Include="WebApi\ValidationRules\AssertBodyDoesNotIncludeValueValidationRule.cs" />
