@@ -35,6 +35,9 @@
     <Reference Include="Microsoft.VisualStudio.QualityTools.WebTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -53,6 +56,8 @@
     <Compile Include="WebApi\Request\TestRequest.cs" />
     <Compile Include="WebApi\Request\TestRequests.cs" />
     <Compile Include="WebApi\Request\TestTasks.cs" />
+    <Compile Include="WebApi\Routing\RouteTest.cs" />
+    <Compile Include="WebApi\Routing\RouteTestAssertions.cs" />
     <Compile Include="WebApi\ValidationRules\AssertBodyDoesNotIncludeValueValidationRule.cs" />
     <Compile Include="WebApi\ValidationRules\AssertBodyEqualsValidationRule.cs" />
     <Compile Include="WebApi\ValidationRules\AssertBodyIncludesValueValidationRule.cs" />
