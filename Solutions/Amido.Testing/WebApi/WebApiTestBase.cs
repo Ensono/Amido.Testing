@@ -41,7 +41,11 @@ namespace Amido.Testing.WebApi
         {
             get
             {
-                testRequests = new TestRequests();
+                if (testRequests == null)
+                {
+                    testRequests = new TestRequests();
+                }
+
                 return testRequests;
             }
         } 
@@ -168,6 +172,7 @@ namespace Amido.Testing.WebApi
             try
             {
                 CleanUp();
+                testRequests = null;
             }
             catch (Exception)
             {
