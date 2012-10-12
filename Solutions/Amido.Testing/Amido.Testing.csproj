@@ -67,6 +67,7 @@
     <Compile Include="WebApi\ValidationRules\AssertBodyEqualsValidationRule.cs" />
     <Compile Include="WebApi\ValidationRules\AssertBodyIncludesValueValidationRule.cs" />
     <Compile Include="WebApi\ValidationRules\AssertBodyIsEmptyValidationRule.cs" />
+    <Compile Include="WebApi\ValidationRules\AssertContentLengthEqualsValidationRule.cs" />
     <Compile Include="WebApi\ValidationRules\AssertContentTypeEqualsValidationRule.cs" />
     <Compile Include="WebApi\ValidationRules\AssertRetryValidationRule.cs" />
     <Compile Include="WebApi\ValidationRules\AssertStatusCodeValidationRule.cs" />
