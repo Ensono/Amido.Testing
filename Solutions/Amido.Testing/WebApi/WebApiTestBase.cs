@@ -159,10 +159,10 @@ namespace Amido.Testing.WebApi
             {
                 StartUp();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 preWebTestEventArgs.WebTest.Outcome = Outcome.Fail;
-                preWebTestEventArgs.WebTest.AddCommentToResult("Startup failed.");
+                preWebTestEventArgs.WebTest.AddCommentToResult("Startup failed: " + ex.ToString());
             }
 
         }
@@ -174,10 +174,10 @@ namespace Amido.Testing.WebApi
                 CleanUp();
                 testRequests = null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 postWebTestEventArgs.WebTest.Outcome = Outcome.Fail;
-                postWebTestEventArgs.WebTest.AddCommentToResult("Cleanup failed.");
+                postWebTestEventArgs.WebTest.AddCommentToResult("Cleanup failed: " + ex.ToString());
             }
         }
 
