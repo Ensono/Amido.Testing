@@ -45,10 +45,11 @@ namespace Amido.Testing.Tests
                          {
                              return new AssertActionValidationRule(r =>
                                                                        {
-                                                                           return r.StatusCode == HttpStatusCode.OK;
-                                                                       }, 
-                                                                       "The action was successful", 
-                                                                       "The action was not successful");
+                                                                           return new AssertActionResult(r.StatusCode == HttpStatusCode.OK,
+                                                                               "The action was successful",
+                                                                               "The action was not successful");
+                                                                       }
+                             );
                          }
                 )
                 .Retry(RetryTestType.StatusCodeEquals, 200, 2, 1000, () =>

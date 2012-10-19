@@ -11,9 +11,7 @@ namespace Amido.Testing.WebApi.ValidationRules
     [DisplayName("Assert Action")]
     public class AssertActionValidationRule : ValidationRule
     {
-        private readonly Func<WebTestResponse, bool> action;
-        private readonly string message;
-        private readonly string errorMessage;
+        private readonly Func<WebTestResponse, AssertActionResult> action;
 
         /// <summary>
         /// Constructs the <see cref="ValidationRule"/>.
@@ -21,15 +19,11 @@ namespace Amido.Testing.WebApi.ValidationRules
         /// <param name="action">The validation action to run.</param>
         /// <param name="message">The successful message.</param>
         /// <param name="errorMessage">The error message.</param>
-        public AssertActionValidationRule(Func<WebTestResponse, bool> action, string message, string errorMessage)
+        public AssertActionValidationRule(Func<WebTestResponse, AssertActionResult> action)
         {
             Contract.Requires(action != null, "Action cannot be null.");
-            Contract.Requires(!string.IsNullOrWhiteSpace(message), "Message cannot be null or empty.");
-            Contract.Requires(!string.IsNullOrWhiteSpace(errorMessage), "Error message cannot be null or empty.");
 
             this.action = action;
-            this.message = message;
-            this.errorMessage = errorMessage;
         }
 
         /// <summary>
@@ -39,14 +33,16 @@ namespace Amido.Testing.WebApi.ValidationRules
         /// <param name="e">The <see cref="ValidationEventArgs"/></param>
         public override void Validate(object sender, ValidationEventArgs e)
         {
-            if(action(e.Response))
+            var assertActionResult = action(e.Response);
+
+            if(assertActionResult.Success)
             {
-                e.Message = message;
+                e.Message = assertActionResult.Message;
             }
             else
             {
                 e.IsValid = false;
-                e.Message = errorMessage;
+                e.Message = assertActionResult.ErrorMessage;
             }
         }
     }
