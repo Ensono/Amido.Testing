@@ -75,6 +75,7 @@
     <Compile Include="WebApi\Request\Verb.cs" />
     <Compile Include="WebApi\ValidationRules\AssertActionValidationRule.cs" />
     <Compile Include="WebApi\ValidationRules\AssertHeadersIncludesValueValidationRule.cs" />
+    <Compile Include="WebApi\ValidationRules\AssertStatusDescriptionValidationRule.cs" />
     <Compile Include="WebApi\WebApiRequest.cs" />
     <Compile Include="WebApi\WebApiTestBase.cs" />
   </ItemGroup>
