@@ -25,6 +25,8 @@ namespace Amido.Testing.Tests
 
         public override void WebTestRequests()
         {
+            var comment = "not set";
+
             Requests
                 .Wait(2000, () =>
                                 {
@@ -45,6 +47,7 @@ namespace Amido.Testing.Tests
                          {
                              return new AssertActionValidationRule(r =>
                                                                        {
+                                                                           comment = string.Format("Demonstrating delegated response: {0}", r.ContentType);
                                                                            return new AssertActionResult(r.StatusCode == HttpStatusCode.OK,
                                                                                "The action was successful",
                                                                                "The action was not successful");
@@ -62,6 +65,8 @@ namespace Amido.Testing.Tests
                      () => { return new AssertStatusCodeValidationRule(200); },
                      () => { return new AssertBodyIncludesValueValidationRule("google"); }
                 );
+
+            FinalOutput(() => { return comment; });
         }
     }
 }

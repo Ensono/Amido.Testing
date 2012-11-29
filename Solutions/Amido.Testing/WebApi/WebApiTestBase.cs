@@ -17,7 +17,8 @@ namespace Amido.Testing.WebApi
         private TestRequests testRequests;
         private WebTestRequest currentRequest;
         private TestRequest currentTestRequest;
-        private Outcome currentWebTestOutcome; 
+        private Outcome currentWebTestOutcome;
+        private Func<string> commentDelegate;
 
         #endregion
 
@@ -147,9 +148,25 @@ namespace Amido.Testing.WebApi
                     }
                 }
             }
-        } 
+            
+            AddFinalOutput();
+        }
+
+        private void AddFinalOutput()
+        {
+            var comment = commentDelegate.Invoke();
+            if (!string.IsNullOrWhiteSpace(comment))
+            {
+                AddCommentToResult(comment);
+            }
+        }
 
         #endregion
+
+        public void FinalOutput(Func<string> commentDelegate)
+        {
+            this.commentDelegate = commentDelegate;
+        }
 
         #region Test Helpers
 
