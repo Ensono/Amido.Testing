@@ -160,10 +160,9 @@ namespace Amido.Testing.WebApi
 
         private void AddFinalOutput()
         {
-            var comment = commentDelegate.Invoke();
-            if (!string.IsNullOrWhiteSpace(comment))
+            if (commentDelegate != null)
             {
-                AddCommentToResult(comment);
+                AddCommentToResult(commentDelegate.Invoke());
             }
         }
 
