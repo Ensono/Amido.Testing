@@ -71,6 +71,27 @@ namespace Amido.Testing.WebApi.Request
         }
 
         /// <summary>
+        /// Adds a retry policy to the <see cref="WebTestRequest"/>.
+        /// </summary>
+        /// <param name="retryTestType">The <see cref="RetryTestType"/>.</param>
+        /// <param name="value">The delegate value to be used in the retry test.</param>
+        /// <param name="maxRetries">The max number of retries.</param>
+        /// <param name="interval">The interval in milliseconds between each retry.</param>
+        /// <param name="webApiRequest">The <see cref="WebTestRequest"/> action.</param>
+        /// <param name="asserts">The <see cref="ValidationRule"/> actions.</param>
+        /// <returns>Returns the current instance of <see cref="TestRequests"/>.</returns>
+        public TestRequests Retry(RetryTestType retryTestType, Func<string> value, int maxRetries, int interval, Func<WebTestRequest> webApiRequest, params Func<ValidationRule>[] asserts)
+        {
+            Contract.Requires(maxRetries >= 0, "The max retries cannot be less than 0.");
+            Contract.Requires(interval >= 0, "The retry interval cannot be less than 0.");
+            Contract.Requires(webApiRequest != null, "The web api request cannot be null.");
+
+            var testRequest = new TestRequest { Request = webApiRequest, Asserts = asserts, RetryTestType = retryTestType, RetryValueDelegate = value, MaxRetries = maxRetries, Interval = interval };
+            Requests.Add(testRequest);
+            return this;
+        }
+
+        /// <summary>
         /// Forces the main thread to wait before running the <see cref="WebTestRequest"/>.
         /// </summary>
         /// <param name="milliseconds">The number of milliseconds to wait before proceeding with the <see cref="WebTestRequest"/>.</param>
