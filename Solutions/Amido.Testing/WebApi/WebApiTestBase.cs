@@ -150,6 +150,11 @@ namespace Amido.Testing.WebApi
                             break;
                         }
 
+                        if (currentTestRequest.RetryTestType == RetryTestType.BodyDoesNotInclude && LastResponse.BodyString.IndexOf(retryValue, StringComparison.Ordinal) == -1)
+                        {
+                            break;
+                        }
+
                         Thread.Sleep(testRequest.Interval);
                     }
                 }

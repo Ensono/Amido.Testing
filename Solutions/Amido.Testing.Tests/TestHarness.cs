@@ -56,14 +56,26 @@ namespace Amido.Testing.Tests
                          }
                 )
                 .Retry(RetryTestType.StatusCodeEquals, 200, 2, 1000, () =>
+                {
+                    return WebApiRequest
+                        .Url("http://www.google.co.uk")
+                        .WithVerb(Verb.GET)
+                        .Create();
+                },
+                     () => { return new AssertStatusCodeValidationRule(200); },
+                     () => { return new AssertBodyIncludesValueValidationRule("google"); }
+                );
+
+            var unwantedText = Guid.NewGuid().ToString();
+            Requests
+                .Retry(RetryTestType.BodyDoesNotInclude, unwantedText, 2, 1000, () =>
                          {
                              return WebApiRequest
                                  .Url("http://www.google.co.uk")
                                  .WithVerb(Verb.GET)
                                  .Create();
                          },
-                     () => { return new AssertStatusCodeValidationRule(200); },
-                     () => { return new AssertBodyIncludesValueValidationRule("google"); }
+                     () => { return new AssertBodyDoesNotIncludeValueValidationRule(unwantedText); }
                 );
 
             FinalOutput(() => { return comment; });
