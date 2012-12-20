@@ -1,7 +1,5 @@
-﻿using System.Linq;
-using Amido.Testing.Azure.Blobs;
+﻿using Amido.Testing.Azure.Blobs;
 using Microsoft.WindowsAzure;
-using Microsoft.WindowsAzure.ServiceRuntime;
 using Microsoft.WindowsAzure.StorageClient;
 using Amido.Testing.Dbc;
 
@@ -42,7 +40,7 @@ namespace Amido.Testing.Azure
 
             try
             {
-                destinationBlob.StartCopyFromBlob(sourceBlob.Uri);
+                destinationBlob.CopyFromBlob(sourceBlob);
             }
             catch (StorageClientException)
             {
@@ -65,7 +63,7 @@ namespace Amido.Testing.Azure
             var blobContainer = client.GetContainerReference(deleteContainerSettings.ContainerName);
             try
             {
-                blobContainer.Delete(AccessCondition.GenerateEmptyCondition(), null);
+                
             }
             catch (StorageClientException)
             {
