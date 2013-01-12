@@ -40,6 +40,7 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Web.Http.WebHost, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -51,8 +52,15 @@
     <Compile Include="Dbc\ContractAssertionException.cs" />
     <Compile Include="Dbc\PostconditionException.cs" />
     <Compile Include="Dbc\PreconditionException.cs" />
+    <Compile Include="Http\IRestClient.cs" />
+    <Compile Include="Http\IRetryAttempts.cs" />
+    <Compile Include="Http\IVerb.cs" />
+    <Compile Include="Http\RestClient.cs" />
+    <Compile Include="Http\RetryType.cs" />
     <Compile Include="LoadTest\Plugins\DynamicUserCountPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Http\AcceptHeader.cs" />
+    <Compile Include="Http\ContentType.cs" />
     <Compile Include="WebApi\Request\AcceptHeader.cs" />
     <Compile Include="WebApi\Request\ContentType.cs" />
     <Compile Include="WebApi\Request\RetryTestType.cs" />

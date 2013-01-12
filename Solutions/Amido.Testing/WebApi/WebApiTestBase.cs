@@ -107,6 +107,8 @@ namespace Amido.Testing.WebApi
                     currentRequest.ValidateResponse += assert().Validate;
                 }
 
+                this.AddCommentToResult("Blah");
+
                 if (testRequest.MaxRetries == 0)
                 {
                     if (testRequest.WaitPeriod > 0)
