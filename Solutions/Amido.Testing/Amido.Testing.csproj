@@ -59,6 +59,7 @@
     <Compile Include="Http\RetryType.cs" />
     <Compile Include="LoadTest\Plugins\DynamicUserCountPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestDataBuilders\TestDataBuilder.cs" />
     <Compile Include="Http\AcceptHeader.cs" />
     <Compile Include="Http\ContentType.cs" />
     <Compile Include="WebApi\Request\AcceptHeader.cs" />
@@ -70,14 +71,19 @@
     <Compile Include="WebApi\Routing\RouteData.cs" />
     <Compile Include="WebApi\Routing\RouteTest.cs" />
     <Compile Include="WebApi\Routing\RouteTestAssertions.cs" />
+    <Compile Include="WebApi\ValidationRules\AssertActionResult.cs" />
     <Compile Include="WebApi\ValidationRules\AssertBodyDoesNotIncludeValueValidationRule.cs" />
     <Compile Include="WebApi\ValidationRules\AssertBodyEqualsValidationRule.cs" />
     <Compile Include="WebApi\ValidationRules\AssertBodyIncludesValueValidationRule.cs" />
     <Compile Include="WebApi\ValidationRules\AssertBodyIsEmptyValidationRule.cs" />
+    <Compile Include="WebApi\ValidationRules\AssertContentLengthEqualsValidationRule.cs" />
+    <Compile Include="WebApi\ValidationRules\AssertContentTypeEqualsValidationRule.cs" />
     <Compile Include="WebApi\ValidationRules\AssertRetryValidationRule.cs" />
     <Compile Include="WebApi\ValidationRules\AssertStatusCodeValidationRule.cs" />
     <Compile Include="WebApi\Request\Verb.cs" />
     <Compile Include="WebApi\ValidationRules\AssertActionValidationRule.cs" />
+    <Compile Include="WebApi\ValidationRules\AssertHeadersIncludesValueValidationRule.cs" />
+    <Compile Include="WebApi\ValidationRules\AssertStatusDescriptionValidationRule.cs" />
     <Compile Include="WebApi\WebApiRequest.cs" />
     <Compile Include="WebApi\WebApiTestBase.cs" />
   </ItemGroup>

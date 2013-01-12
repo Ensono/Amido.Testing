@@ -17,7 +17,8 @@ namespace Amido.Testing.WebApi
         private TestRequests testRequests;
         private WebTestRequest currentRequest;
         private TestRequest currentTestRequest;
-        private Outcome currentWebTestOutcome; 
+        private Outcome currentWebTestOutcome;
+        private Func<string> commentDelegate;
 
         #endregion
 
@@ -119,28 +120,39 @@ namespace Amido.Testing.WebApi
                 }
                 else
                 {
+                    var retryValue = testRequest.RetryValue;
+                    if (testRequest.RetryValueDelegate != null)
+                    {
+                        retryValue = testRequest.RetryValueDelegate.Invoke();
+                    }
+
                     currentRequest.PostRequest += CurrentRequestOnPostRequest;
 
                     for (var i = 0; i <= testRequest.MaxRetries; i++)
                     {
                         //TestValidateRetry(testRequest, i);
 
-                        currentRequest.ValidateResponse += new AssertRetryValidationRule(currentTestRequest.RetryTestType, currentTestRequest.RetryValue).Validate;
+                        currentRequest.ValidateResponse += new AssertRetryValidationRule(testRequest.RetryTestType, retryValue).Validate;
 
                         yield return currentRequest;
 
 
-                        if (currentTestRequest.RetryTestType == RetryTestType.StatusCodeEquals && (int)LastResponse.StatusCode == int.Parse(testRequest.RetryValue))
+                        if (currentTestRequest.RetryTestType == RetryTestType.StatusCodeEquals && (int)LastResponse.StatusCode == int.Parse(retryValue))
                         {
                             break;
                         }
 
-                        if (currentTestRequest.RetryTestType == RetryTestType.BodyEquals && LastResponse.BodyString == testRequest.RetryValue)
+                        if (currentTestRequest.RetryTestType == RetryTestType.BodyEquals && LastResponse.BodyString == retryValue)
                         {
                             break;
                         }
 
-                        if (currentTestRequest.RetryTestType == RetryTestType.BodyIncludes && LastResponse.BodyString.IndexOf(testRequest.RetryValue, StringComparison.Ordinal) > -1)
+                        if (currentTestRequest.RetryTestType == RetryTestType.BodyIncludes && LastResponse.BodyString.IndexOf(retryValue, StringComparison.Ordinal) > -1)
+                        {
+                            break;
+                        }
+
+                        if (currentTestRequest.RetryTestType == RetryTestType.BodyDoesNotInclude && LastResponse.BodyString.IndexOf(retryValue, StringComparison.Ordinal) == -1)
                         {
                             break;
                         }
@@ -149,9 +161,24 @@ namespace Amido.Testing.WebApi
                     }
                 }
             }
-        } 
+            
+            AddFinalOutput();
+        }
+
+        private void AddFinalOutput()
+        {
+            if (commentDelegate != null)
+            {
+                AddCommentToResult(commentDelegate.Invoke());
+            }
+        }
 
         #endregion
+
+        public void FinalOutput(Func<string> commentDelegate)
+        {
+            this.commentDelegate = commentDelegate;
+        }
 
         #region Test Helpers
 
@@ -161,10 +188,10 @@ namespace Amido.Testing.WebApi
             {
                 StartUp();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 preWebTestEventArgs.WebTest.Outcome = Outcome.Fail;
-                preWebTestEventArgs.WebTest.AddCommentToResult("Startup failed.");
+                preWebTestEventArgs.WebTest.AddCommentToResult("Startup failed: " + ex.ToString());
             }
 
         }
@@ -176,10 +203,10 @@ namespace Amido.Testing.WebApi
                 CleanUp();
                 testRequests = null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 postWebTestEventArgs.WebTest.Outcome = Outcome.Fail;
-                postWebTestEventArgs.WebTest.AddCommentToResult("Cleanup failed.");
+                postWebTestEventArgs.WebTest.AddCommentToResult("Cleanup failed: " + ex.ToString());
             }
         }
 

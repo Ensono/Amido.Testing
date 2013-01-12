@@ -16,6 +16,11 @@
         BodyIncludes,
 
         /// <summary>
+        /// Retry until the body does not include the specified value.
+        /// </summary>
+        BodyDoesNotInclude,
+
+        /// <summary>
         /// Retry until the status code equals the specified value.
         /// </summary>
         StatusCodeEquals
