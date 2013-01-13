@@ -26,7 +26,7 @@ namespace Amido.Testing.SpecFlow.Http
                     string newKey;
                     do
                     {
-                        newKey = string.Format("{0}{1}", key, newKeySuffix);
+                        newKey = string.Format("{0}_{1}", key, newKeySuffix + 2);
                         newKeySuffix++;
                     } while (context.ContainsKey(newKey));
 

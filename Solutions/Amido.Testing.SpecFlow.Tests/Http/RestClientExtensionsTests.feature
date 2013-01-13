@@ -19,3 +19,8 @@ Scenario: Call Some Sites
 	Then the scenario context responses collection should include 3 requests
 	And the last response should be set
 	And the response http status code should be 200
+
+	When I call Yahoo at url http://www.google.co.uk
+	Then the scenario context responses collection should include 4 requests
+	And the last response should be set
+	And the response http status code should be 200
