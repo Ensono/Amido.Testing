@@ -25,7 +25,7 @@ namespace Amido.Testing.Http
 
         #region Construction
 
-        public static IRetryAttempts RequestUrl(string url, params object[] tokens)
+        public static IRetryAttempts RequestUri(string url, params object[] tokens)
         {
             Contract.Requires(!string.IsNullOrWhiteSpace(url), "The url cannot be null or empty.");
 
@@ -43,7 +43,7 @@ namespace Amido.Testing.Http
 
         #endregion
 
-        public IVerb NoRetries()
+        public IVerb WithoutRetries()
         {
             httpRequestMessageList.Add(new HttpRequestMessage());
             MaxRetries = 1;
@@ -218,7 +218,7 @@ namespace Amido.Testing.Http
 
         #endregion
 
-        public virtual HttpResponseMessage Execute()
+        public virtual HttpResponseMessage MakeRequest()
         {
             HttpResponseMessage httpResponseMessage = null;
             

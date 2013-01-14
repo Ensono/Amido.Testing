@@ -18,10 +18,10 @@ namespace Amido.Testing.SpecFlow.Tests.Http
         [When("I call (.*) at url (.*)")]
         public void GivenIPerformAGetOnUrl(string siteName, string url)
         {
-            RestClient.RequestUrl(url)
+            RestClient.RequestUri(url)
                 .WithRetries(RetryType.UntilStatusCodeEquals, 200, 2, 1000)
                 .WithVerb(HttpMethod.Get)
-                .Execute()
+                .MakeRequest()
                 .StoreResponseOnScenarioContext(siteName);
         }
 

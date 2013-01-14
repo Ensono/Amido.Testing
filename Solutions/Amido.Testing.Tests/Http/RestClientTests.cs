@@ -12,10 +12,10 @@ namespace Amido.Testing.Tests.Http
         public void Should_Call_Google_And_Return_Valid_Response()
         {
             // Act
-            var result = RestClient.RequestUrl("http://www.google.co.uk")
-                .NoRetries()
+            var result = RestClient.RequestUri("http://www.google.co.uk")
+                .WithoutRetries()
                 .WithVerb(HttpMethod.Get)
-                .Execute();
+                .MakeRequest();
 
             // Assert
             Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);

@@ -62,6 +62,6 @@ namespace Amido.Testing.Http
         /// Executes the http request.
         /// </summary>
         /// <returns>A <see cref="HttpResponseMessage"/>.</returns>
-        HttpResponseMessage Execute();
+        HttpResponseMessage MakeRequest();
     }
 }
