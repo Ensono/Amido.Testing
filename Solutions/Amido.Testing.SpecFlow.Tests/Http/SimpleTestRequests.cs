@@ -28,14 +28,14 @@ namespace Amido.Testing.SpecFlow.Tests.Http
         [Then("the scenario context responses collection should include (.*) requests")]
         public void VerifyScenarioContextResponses(int numberOfRequestsInCollection)
         {
-            var context = ScenarioContextService.GetContext<ScenarioResponseDictionary>();
+            var context = ScenarioContextService.GetScenarioResponseDictionary();
             Assert.AreEqual(numberOfRequestsInCollection, context.Count);
         }
 
         [Then("the last response should be set")]
         public void VerifyLastResponse()
         {
-            var context = ScenarioContextService.GetContext<ScenarioResponseDictionary>();
+            var context = ScenarioContextService.GetScenarioResponseDictionary();
             Assert.IsNotNull(context.LastResponse);
         }
     }

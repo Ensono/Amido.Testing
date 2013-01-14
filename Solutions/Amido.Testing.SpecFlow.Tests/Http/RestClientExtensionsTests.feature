@@ -24,3 +24,10 @@ Scenario: Call Some Sites
 	Then the scenario context responses collection should include 4 requests
 	And the last response should be set
 	And the response http status code should be 200
+
+	Scenario: Call Some Sites 2
+
+	When I call Google at url http://www.google.co.uk
+	Then the scenario context responses collection should include 1 requests
+	And the last response should be set
+	And the response http status code should be 200

@@ -111,6 +111,26 @@ this.ScenarioSetup(scenarioInfo);
 #line hidden
             this.ScenarioCleanup();
         }
+        
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Call Some Sites 2")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "RestClientExtensionsTests")]
+        public virtual void CallSomeSites2()
+        {
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Call Some Sites 2", ((string[])(null)));
+#line 28
+ this.ScenarioSetup(scenarioInfo);
+#line 30
+ testRunner.When("I call Google at url http://www.google.co.uk", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line 31
+ testRunner.Then("the scenario context responses collection should include 1 requests", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 32
+ testRunner.And("the last response should be set", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 33
+ testRunner.And("the response http status code should be 200", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            this.ScenarioCleanup();
+        }
     }
 }
 #pragma warning restore
