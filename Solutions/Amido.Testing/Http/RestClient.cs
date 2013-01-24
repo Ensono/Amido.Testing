@@ -255,6 +255,8 @@ namespace Amido.Testing.Http
                         return httpResponseMessage;
                     }
                 }
+
+                Thread.Sleep(Interval);
             }
 
             return httpResponseMessage;
