@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Amido.Testing.Dbc;
 using System.Threading;
+using System.Linq;
 
 namespace Amido.Testing.Http
 {
@@ -243,7 +245,11 @@ namespace Amido.Testing.Http
                         }
                     }
 
+                    WriteRequestToDebugWindow(currentRetryIndex, httpRequestMessage);
+
                     httpResponseMessage = httpClient.SendAsync(httpRequestMessage).Result;
+
+                    WriteResponseToDebugWindow(currentRetryIndex, httpResponseMessage);
 
                     if(IsFinalRetryRequest(currentRetryIndex))
                     {
@@ -261,6 +267,88 @@ namespace Amido.Testing.Http
 
             return httpResponseMessage;
         }
+
+        private void WriteResponseToDebugWindow(int currentRetryIndex, HttpResponseMessage httpResponseMessage)
+        {
+            Debug.WriteLine("RESPONSE " + (currentRetryIndex + 1));
+            Debug.WriteLine("-----------------------------------------------------------------------------------------------------" + "\n\n");
+
+            Debug.WriteLine("Http Status Code: " + httpResponseMessage.StatusCode);
+            Debug.WriteLine("\n \n");
+
+            if (httpResponseMessage.Headers != null || (httpResponseMessage.Content != null && httpResponseMessage.Headers != null))
+            {
+                Debug.WriteLine("HEADERS");
+                if (httpResponseMessage.Headers != null)
+                {
+
+                    foreach (var header in httpResponseMessage.Headers)
+                    {
+                        Debug.WriteLine(header.Key + ": " + header.Value.FirstOrDefault());
+                    }
+                }
+
+                if (httpResponseMessage.Content.Headers != null)
+                {
+
+                    foreach (var header in httpResponseMessage.Content.Headers)
+                    {
+                        Debug.WriteLine(header.Key + ": " + header.Value.FirstOrDefault());
+                    }
+                }
+                Debug.WriteLine("\n \n");
+            }
+
+            if (httpResponseMessage.Content != null)
+            {
+                Debug.WriteLine("BODY");
+                Debug.WriteLine(httpResponseMessage.Content.ReadAsStringAsync().Result);
+                Debug.WriteLine("\n \n");
+            }
+            Debug.WriteLine("=======================================================================================================");
+            Debug.WriteLine("\n \n");
+            Debug.WriteLine("\n \n");
+        }
+
+        private void WriteRequestToDebugWindow(int currentRetryIndex, HttpRequestMessage httpRequestMessage)
+        {
+            Debug.WriteLine("REQUEST " + (currentRetryIndex + 1));
+            Debug.WriteLine("-----------------------------------------------------------------------------------------------------" + "\n\n");
+            Debug.WriteLine(httpRequestMessage.Method.Method + " " + httpRequestMessage.RequestUri);
+
+            Debug.WriteLine("\n \n");
+
+            if (httpRequestMessage.Headers != null || (httpRequestMessage.Content != null && httpRequestMessage.Headers != null))
+            {
+                Debug.WriteLine("HEADERS");
+                if (httpRequestMessage.Headers != null)
+                {
+
+                    foreach (var header in httpRequestMessage.Headers)
+                    {
+                        Debug.WriteLine(header.Key + ": " + header.Value.FirstOrDefault());
+                    }
+                }
+
+                if (httpRequestMessage.Content.Headers != null)
+                {
+
+                    foreach (var header in httpRequestMessage.Content.Headers)
+                    {
+                        Debug.WriteLine(header.Key + ": " + header.Value.FirstOrDefault());
+                    }
+                }
+                Debug.WriteLine("\n \n");
+            }
+
+            if(httpRequestMessage.Content != null)
+            {
+                Debug.WriteLine("BODY");
+                Debug.WriteLine(httpRequestMessage.Content.ReadAsStringAsync().Result);
+                Debug.WriteLine("\n \n");
+            }
+        }
+
 
         private bool IsFinalRetryRequest(int currentRetryIndex)
         {

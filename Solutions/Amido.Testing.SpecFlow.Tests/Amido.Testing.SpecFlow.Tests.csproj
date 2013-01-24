@@ -48,10 +48,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Http\HttpAssertions.cs" />
-    <Compile Include="Http\RestClientExtensionsTests.feature.cs">
+    <Compile Include="Http\LoggingTest.feature.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>RestClientExtensionsTests.feature</DependentUpon>
+      <DependentUpon>LoggingTest.feature</DependentUpon>
     </Compile>
     <Compile Include="Http\SimpleTestRequests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -69,6 +69,10 @@
   <ItemGroup>
     <None Include="App.config">
       <SubType>Designer</SubType>
+    </None>
+    <None Include="Http\LoggingTest.feature">
+      <Generator>SpecFlowSingleFileGenerator</Generator>
+      <LastGenOutput>LoggingTest.feature.cs</LastGenOutput>
     </None>
     <None Include="Http\RestClientExtensionsTests.feature">
       <Generator>SpecFlowSingleFileGenerator</Generator>
