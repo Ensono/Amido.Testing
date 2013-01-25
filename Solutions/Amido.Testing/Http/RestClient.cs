@@ -312,7 +312,9 @@ namespace Amido.Testing.Http
                 if (httpResponseMessage.Content != null)
                 {
                     Debug.WriteLine("BODY");
-                    Debug.WriteLine(httpResponseMessage.Content.ReadAsStringAsync().Result);
+                    Debug.WriteLine(httpResponseMessage.Content.Headers.ContentType.MediaType.Contains("image")
+                                        ? "<image>"
+                                        : httpResponseMessage.Content.ReadAsStringAsync().Result);
                     Debug.WriteLine("\n \n");
                 }
                 Debug.WriteLine(
@@ -372,7 +374,9 @@ namespace Amido.Testing.Http
                 if (httpRequestMessage.Content != null)
                 {
                     Debug.WriteLine("BODY");
-                    Debug.WriteLine(httpRequestMessage.Content.ReadAsStringAsync().Result);
+                    Debug.WriteLine(httpRequestMessage.Content.Headers.ContentType.MediaType.Contains("image")
+                                        ? "<image>"
+                                        : httpRequestMessage.Content.ReadAsStringAsync().Result);
                     Debug.WriteLine("\n \n");
                 }
             }
