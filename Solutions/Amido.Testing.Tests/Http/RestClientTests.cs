@@ -2,6 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Amido.Testing.Http;
 using System.Net.Http;
+using System;
 
 namespace Amido.Testing.Tests.Http
 {
@@ -16,6 +17,7 @@ namespace Amido.Testing.Tests.Http
                 .WithoutRetries()
                 .WithVerb(HttpMethod.Get)
                 .MakeRequest();
+            System.Diagnostics.Debug.WriteLine("Blah");
 
             // Assert
             Assert.AreEqual(HttpStatusCode.OK, result.StatusCode);

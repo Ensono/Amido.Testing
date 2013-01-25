@@ -15,6 +15,30 @@ namespace Amido.Testing.SpecFlow.Tests.Http
             
         }
 
+        [When("I call google")]
+        public void GivenIPerformAGetOnUrl()
+        {
+            RestClient.RequestUri("http://www.google.com")
+                .WithRetries(RetryType.UntilStatusCodeEquals, 200, 3, 1000)
+                .WithVerb(HttpMethod.Post)
+                .AddAcceptHeader(AcceptHeader.Json)
+                .AddAuthorizationHeader("Bearer", "1234")
+                .AddContentType(ContentType.Json)
+                .AddBody("blah")
+                .MakeRequest()
+                .StoreResponseOnScenarioContext();
+
+            RestClient.RequestUri("http://www.google.com")
+                .WithRetries(RetryType.UntilStatusCodeEquals, 200, 3, 1000)
+                .WithVerb(HttpMethod.Post)
+                .AddAcceptHeader(AcceptHeader.Json)
+                .AddAuthorizationHeader("Bearer", "1234")
+                .AddContentType(ContentType.Json)
+                .AddBody("blah")
+                .MakeRequest()
+                .StoreResponseOnScenarioContext();
+        }
+
         [When("I call (.*) at url (.*)")]
         public void GivenIPerformAGetOnUrl(string siteName, string url)
         {
