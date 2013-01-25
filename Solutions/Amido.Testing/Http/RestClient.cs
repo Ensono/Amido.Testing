@@ -288,7 +288,7 @@ namespace Amido.Testing.Http
                     }
                 }
 
-                if (httpResponseMessage.Content.Headers != null)
+                if (httpResponseMessage.Content != null && httpResponseMessage.Content.Headers != null)
                 {
 
                     foreach (var header in httpResponseMessage.Content.Headers)
@@ -330,7 +330,7 @@ namespace Amido.Testing.Http
                     }
                 }
 
-                if (httpRequestMessage.Content.Headers != null)
+                if (httpRequestMessage.Content != null && httpRequestMessage.Content.Headers != null)
                 {
 
                     foreach (var header in httpRequestMessage.Content.Headers)
