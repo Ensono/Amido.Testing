@@ -245,11 +245,11 @@ namespace Amido.Testing.Http
                         }
                     }
 
-                    WriteRequestToDebugWindow(currentRetryIndex, httpRequestMessage);
+                    WriteRequestToDebugWindow(currentRetryIndex, MaxRetries, httpRequestMessage);
 
                     httpResponseMessage = httpClient.SendAsync(httpRequestMessage).Result;
 
-                    WriteResponseToDebugWindow(currentRetryIndex, httpResponseMessage);
+                    WriteResponseToDebugWindow(currentRetryIndex, MaxRetries, httpResponseMessage);
 
                     if(IsFinalRetryRequest(currentRetryIndex))
                     {
@@ -268,84 +268,118 @@ namespace Amido.Testing.Http
             return httpResponseMessage;
         }
 
-        private void WriteResponseToDebugWindow(int currentRetryIndex, HttpResponseMessage httpResponseMessage)
+        private void WriteResponseToDebugWindow(int currentRetryIndex, int maxRetries, HttpResponseMessage httpResponseMessage)
         {
-            Debug.WriteLine("RESPONSE " + (currentRetryIndex + 1));
-            Debug.WriteLine("-----------------------------------------------------------------------------------------------------" + "\n\n");
-
-            Debug.WriteLine("Http Status Code: " + httpResponseMessage.StatusCode);
-            Debug.WriteLine("\n \n");
-
-            if (httpResponseMessage.Headers != null || (httpResponseMessage.Content != null && httpResponseMessage.Headers != null))
+            try
             {
-                Debug.WriteLine("HEADERS");
-                if (httpResponseMessage.Headers != null)
-                {
 
-                    foreach (var header in httpResponseMessage.Headers)
+                Debug.WriteLine("RESPONSE");
+                if ((maxRetries > 1))
+                {
+                    Debug.WriteLine("Retry Response " + (currentRetryIndex + 1));
+                }
+                Debug.WriteLine(
+                    "-----------------------------------------------------------------------------------------------------" +
+                    "\n\n");
+
+                Debug.WriteLine("Http Status Code: " + httpResponseMessage.StatusCode);
+                Debug.WriteLine("\n \n");
+
+                if (httpResponseMessage.Headers != null ||
+                    (httpResponseMessage.Content != null && httpResponseMessage.Headers != null))
+                {
+                    Debug.WriteLine("HEADERS");
+                    if (httpResponseMessage.Headers != null)
                     {
-                        Debug.WriteLine(header.Key + ": " + header.Value.FirstOrDefault());
+
+                        foreach (var header in httpResponseMessage.Headers)
+                        {
+                            Debug.WriteLine(header.Key + ": " + header.Value.FirstOrDefault());
+                        }
                     }
+
+                    if (httpResponseMessage.Content != null && httpResponseMessage.Content.Headers != null)
+                    {
+
+                        foreach (var header in httpResponseMessage.Content.Headers)
+                        {
+                            Debug.WriteLine(header.Key + ": " + header.Value.FirstOrDefault());
+                        }
+                    }
+                    Debug.WriteLine("\n \n");
                 }
 
-                if (httpResponseMessage.Content != null && httpResponseMessage.Content.Headers != null)
+                if (httpResponseMessage.Content != null)
                 {
-
-                    foreach (var header in httpResponseMessage.Content.Headers)
-                    {
-                        Debug.WriteLine(header.Key + ": " + header.Value.FirstOrDefault());
-                    }
+                    Debug.WriteLine("BODY");
+                    Debug.WriteLine(httpResponseMessage.Content.ReadAsStringAsync().Result);
+                    Debug.WriteLine("\n \n");
                 }
+                Debug.WriteLine(
+                    "=======================================================================================================");
                 Debug.WriteLine("\n \n");
-            }
+                Debug.WriteLine("\n \n");
 
-            if (httpResponseMessage.Content != null)
-            {
-                Debug.WriteLine("BODY");
-                Debug.WriteLine(httpResponseMessage.Content.ReadAsStringAsync().Result);
-                Debug.WriteLine("\n \n");
             }
-            Debug.WriteLine("=======================================================================================================");
-            Debug.WriteLine("\n \n");
-            Debug.WriteLine("\n \n");
+            catch (Exception)
+            {
+                // do not throw if logging fails
+            }
         }
 
-        private void WriteRequestToDebugWindow(int currentRetryIndex, HttpRequestMessage httpRequestMessage)
+        private void WriteRequestToDebugWindow(int currentRetryIndex, int maxRetries, HttpRequestMessage httpRequestMessage)
         {
-            Debug.WriteLine("REQUEST " + (currentRetryIndex + 1));
-            Debug.WriteLine("-----------------------------------------------------------------------------------------------------" + "\n\n");
-            Debug.WriteLine(httpRequestMessage.Method.Method + " " + httpRequestMessage.RequestUri);
-
-            Debug.WriteLine("\n \n");
-
-            if (httpRequestMessage.Headers != null || (httpRequestMessage.Content != null && httpRequestMessage.Headers != null))
+            try
             {
-                Debug.WriteLine("HEADERS");
-                if (httpRequestMessage.Headers != null)
+
+
+                Debug.WriteLine("REQUEST");
+                if ((maxRetries > 1))
                 {
-
-                    foreach (var header in httpRequestMessage.Headers)
-                    {
-                        Debug.WriteLine(header.Key + ": " + header.Value.FirstOrDefault());
-                    }
+                    Debug.WriteLine("Retry Attempt " + (currentRetryIndex + 1));
                 }
+                Debug.WriteLine(
+                    "-----------------------------------------------------------------------------------------------------" +
+                    "\n\n");
+                Debug.WriteLine(httpRequestMessage.Method.Method + " " + httpRequestMessage.RequestUri);
 
-                if (httpRequestMessage.Content != null && httpRequestMessage.Content.Headers != null)
-                {
-
-                    foreach (var header in httpRequestMessage.Content.Headers)
-                    {
-                        Debug.WriteLine(header.Key + ": " + header.Value.FirstOrDefault());
-                    }
-                }
                 Debug.WriteLine("\n \n");
+
+                if (httpRequestMessage.Headers != null ||
+                    (httpRequestMessage.Content != null && httpRequestMessage.Headers != null))
+                {
+                    Debug.WriteLine("HEADERS");
+                    if (httpRequestMessage.Headers != null)
+                    {
+
+                        foreach (var header in httpRequestMessage.Headers)
+                        {
+                            Debug.WriteLine(header.Key + ": " + header.Value.FirstOrDefault());
+                        }
+                    }
+
+                    if (httpRequestMessage.Content != null && httpRequestMessage.Content.Headers != null)
+                    {
+
+                        foreach (var header in httpRequestMessage.Content.Headers)
+                        {
+                            Debug.WriteLine(header.Key + ": " + header.Value.FirstOrDefault());
+                        }
+                    }
+                    Debug.WriteLine("\n \n");
+                }
+
+                if (httpRequestMessage.Content != null)
+                {
+                    Debug.WriteLine("BODY");
+                    Debug.WriteLine(httpRequestMessage.Content.ReadAsStringAsync().Result);
+                    Debug.WriteLine("\n \n");
+                }
             }
-
-            if(httpRequestMessage.Content != null)
+            catch (Exception)
             {
-                Debug.WriteLine("BODY");
-                Debug.WriteLine(httpRequestMessage.Content.ReadAsStringAsync().Result);
-                Debug.WriteLine("\n \n");
+
+                throw;
             }
         }
 
