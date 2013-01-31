@@ -312,7 +312,8 @@ namespace Amido.Testing.Http
                 if (httpResponseMessage.Content != null)
                 {
                     Debug.WriteLine("BODY");
-                    Debug.WriteLine(httpResponseMessage.Content.Headers.ContentType.MediaType.Contains("image")
+                    Debug.WriteLine(httpResponseMessage.Content.Headers.ContentType.MediaType.Contains("image") ||
+                                    httpResponseMessage.Content.Headers.ContentType.MediaType.Contains("binary")
                                         ? "<image>"
                                         : httpResponseMessage.Content.ReadAsStringAsync().Result);
                     Debug.WriteLine("\n \n");
@@ -374,7 +375,8 @@ namespace Amido.Testing.Http
                 if (httpRequestMessage.Content != null)
                 {
                     Debug.WriteLine("BODY");
-                    Debug.WriteLine(httpRequestMessage.Content.Headers.ContentType.MediaType.Contains("image")
+                    Debug.WriteLine(httpRequestMessage.Content.Headers.ContentType.MediaType.Contains("image") ||
+                                    httpRequestMessage.Content.Headers.ContentType.MediaType.Contains("binary")
                                         ? "<image>"
                                         : httpRequestMessage.Content.ReadAsStringAsync().Result);
                     Debug.WriteLine("\n \n");
