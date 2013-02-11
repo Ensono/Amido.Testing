@@ -51,6 +51,38 @@ namespace Amido.Testing.Azure
         }
 
         /// <summary>
+        /// Uploads data (raw bytes or string data) to a container.
+        /// </summary>
+        /// <param name="uploadBlockBlobSettings">A <see cref="UploadBlockBlobSettings"/>.</param>
+        public static void UploadBlockBlob(UploadBlockBlobSettings uploadBlockBlobSettings)
+        {
+            Contract.Requires(uploadBlockBlobSettings != null, "The upload block blob settings cannot be null.");
+
+            var destinationStorageAccount = new CloudStorageAccount(new StorageCredentialsAccountAndKey(uploadBlockBlobSettings.BlobStorageDestination, uploadBlockBlobSettings.BlobStorageDestinationKey), uploadBlockBlobSettings.UseHttps);
+            var destinationClient = destinationStorageAccount.CreateCloudBlobClient();
+            var destinationContainer = destinationClient.GetContainerReference(uploadBlockBlobSettings.DestinationContainerName);
+
+            try
+            {
+                destinationContainer.CreateIfNotExist();
+            }
+            catch
+            {
+                // do nothing, create if not exists blows up if it already exists... nice.
+            }
+
+            CloudBlob destinationBlob = destinationClient.GetBlockBlobReference(uploadBlockBlobSettings.BlobDestinationPath);
+
+            if (uploadBlockBlobSettings.RawData != null)
+            {
+                destinationBlob.UploadByteArray(uploadBlockBlobSettings.RawData);
+            } else if (uploadBlockBlobSettings.StringData != null)
+            {
+                destinationBlob.UploadText(uploadBlockBlobSettings.StringData);
+            }
+        }
+
+        /// <summary>
         /// Deletes a container.
         /// </summary>
         /// <param name="deleteContainerSettings">A <see cref="DeleteContainerSettings"/>.</param>
