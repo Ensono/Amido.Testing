@@ -1,9 +1,9 @@
 ﻿using System.Linq;
+using System.Threading;
 using Amido.Testing.Azure.Blobs;
-using Microsoft.WindowsAzure;
-using Microsoft.WindowsAzure.ServiceRuntime;
-using Microsoft.WindowsAzure.StorageClient;
 using Amido.Testing.Dbc;
+using Microsoft.WindowsAzure;
+using Microsoft.WindowsAzure.StorageClient;
 
 namespace Amido.Testing.Azure
 {
@@ -40,13 +40,45 @@ namespace Amido.Testing.Azure
 
             CloudBlob destinationBlob = destinationClient.GetBlockBlobReference(copyBlockBlobSettings.BlobDestinationPath);
 
-            try
+            destinationBlob.StartCopyFromBlob(sourceBlob.Uri);
+
+            MonitorCopy(destinationBlob.Container);
+        }
+
+        /// <summary>
+        ///  Taken from: http://blogs.msdn.com/b/windowsazurestorage/archive/2012/06/12/introducing-asynchronous-cross-account-copy-blob.aspx
+        /// </summary>
+        /// <param name="destContainer">The container to monitor</param>
+        public static void MonitorCopy(CloudBlobContainer destContainer)
+        {
+            var pendingCopy = true;
+
+            while (pendingCopy)
             {
-                destinationBlob.StartCopyFromBlob(sourceBlob.Uri);
-            }
-            catch (StorageClientException)
-            {
-                throw;
+                pendingCopy = false;
+                var destBlobList = destContainer.ListBlobs(true, BlobListingDetails.Copy);
+
+                foreach (var destBlob in destBlobList.Select(dest => dest as CloudBlob))
+                {
+                    if (destBlob.CopyState == null)
+                    {
+                        return;
+                    }
+
+                    switch (destBlob.CopyState.Status)
+                    {
+                        case CopyStatus.Failed:
+                        case CopyStatus.Aborted:
+                            pendingCopy = true;
+                            destBlob.StartCopyFromBlob(destBlob.CopyState.Source);
+                            break;
+                        case CopyStatus.Pending:
+                            pendingCopy = true;
+                            break;
+                    }
+                }
+
+                Thread.Sleep(1000);
             }
         }
 
@@ -76,7 +108,8 @@ namespace Amido.Testing.Azure
             if (uploadBlockBlobSettings.RawData != null)
             {
                 destinationBlob.UploadByteArray(uploadBlockBlobSettings.RawData);
-            } else if (uploadBlockBlobSettings.StringData != null)
+            }
+            else if (uploadBlockBlobSettings.StringData != null)
             {
                 destinationBlob.UploadText(uploadBlockBlobSettings.StringData);
             }
@@ -95,14 +128,8 @@ namespace Amido.Testing.Azure
             var client = storageAccount.CreateCloudBlobClient();
 
             var blobContainer = client.GetContainerReference(deleteContainerSettings.ContainerName);
-            try
-            {
-                blobContainer.Delete(AccessCondition.GenerateEmptyCondition(), null);
-            }
-            catch (StorageClientException)
-            {
-                throw;
-            }
+            
+            blobContainer.Delete(AccessCondition.GenerateEmptyCondition(), null);
         }
     }
 }
