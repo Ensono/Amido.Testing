@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using Amido.Testing.Azure.Blobs;
 using Amido.Testing.Dbc;
@@ -55,25 +56,25 @@ namespace Amido.Testing.Azure
 
             while (pendingCopy)
             {
-                pendingCopy = false;
                 var destBlobList = destContainer.ListBlobs(true, BlobListingDetails.Copy);
 
                 foreach (var destBlob in destBlobList.Select(dest => dest as CloudBlob))
                 {
                     if (destBlob.CopyState == null)
                     {
-                        return;
+                        Debug.WriteLine("BlobStorage.MonitorCopy: CopyState is null");
+                        break;
                     }
 
                     switch (destBlob.CopyState.Status)
                     {
                         case CopyStatus.Failed:
                         case CopyStatus.Aborted:
-                            pendingCopy = true;
+                            Debug.WriteLine("BlobStorage.MonitorCopy: Copy Failed or Aborted; restarting copy");
                             destBlob.StartCopyFromBlob(destBlob.CopyState.Source);
                             break;
-                        case CopyStatus.Pending:
-                            pendingCopy = true;
+                        case CopyStatus.Success:
+                            pendingCopy = false;
                             break;
                     }
                 }
