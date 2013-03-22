@@ -120,8 +120,8 @@ namespace Amido.Testing.Azure
         /// <summary>
         /// Deletes a container.
         /// </summary>
-        /// <param name="deleteContainerSettings">A <see cref="DeleteContainerSettings"/>.</param>
-        public static void DeleteContainer(DeleteContainerSettings deleteContainerSettings)
+        /// <param name="deleteContainerSettings">A <see cref="ContainerSettings"/>.</param>
+        public static void DeleteContainer(ContainerSettings deleteContainerSettings)
         {
             Contract.Requires(deleteContainerSettings != null, "The delete container settings cannot be null.");
 
@@ -132,6 +132,33 @@ namespace Amido.Testing.Azure
             var blobContainer = client.GetContainerReference(deleteContainerSettings.ContainerName);
             
             blobContainer.Delete(AccessCondition.GenerateEmptyCondition(), null);
+        }
+
+        public static bool ContainerExists(ContainerSettings containerSettings)
+        {
+            Contract.Requires(containerSettings != null, "The container settings cannot be null.");
+
+            var storageAccount =
+                new CloudStorageAccount(
+                    new StorageCredentialsAccountAndKey(containerSettings.BlobStorageDestination,
+                                                        containerSettings.BlobStorageDestinationKey), true);
+
+            var client = storageAccount.CreateCloudBlobClient();
+
+            var blobContainer = client.GetContainerReference(containerSettings.ContainerName);
+
+            if (containerSettings.SubContainerName != null)
+                blobContainer = blobContainer.GetDirectoryReference(containerSettings.SubContainerName).Container;
+
+            try
+            {
+                blobContainer.FetchAttributes();
+                return true;
+            }
+            catch (StorageClientException ex)
+            {
+                return false;
+            }
         }
     }
 }

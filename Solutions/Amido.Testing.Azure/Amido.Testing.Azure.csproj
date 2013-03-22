@@ -49,7 +49,7 @@
     <Compile Include="BlobStorage.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="Blobs\BlockBlobSettings.cs" />
-    <Compile Include="Blobs\DeleteContainerSettings.cs" />
+    <Compile Include="Blobs\ContainerSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TableStorage.cs" />
     <Compile Include="Tables\BatchDataContext.cs" />
