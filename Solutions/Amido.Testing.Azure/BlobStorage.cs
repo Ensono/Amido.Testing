@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using Amido.Testing.Azure.Blobs;
@@ -81,6 +82,25 @@ namespace Amido.Testing.Azure
                 }
 
                 Thread.Sleep(1000);
+            }
+        }
+        
+        /// <summary>
+        /// Downloads a blob from a container.
+        /// </summary>
+        /// <param name="downloadBlockBlobSettings">A <see cref="DownloadBlockBlobSettings"/>.</param>
+        public static MemoryStream DownloadBlockBlob(DownloadBlockBlobSettings downloadBlockBlobSettings)
+        {
+            Contract.Requires(downloadBlockBlobSettings != null, "The copy block blob settings cannot be null.");
+
+            var storageAccount = new CloudStorageAccount(new StorageCredentialsAccountAndKey(downloadBlockBlobSettings.BlobStorage, downloadBlockBlobSettings.BlobStorageKey), downloadBlockBlobSettings.UseHttps);
+            var client = storageAccount.CreateCloudBlobClient();
+            var container = client.GetContainerReference(downloadBlockBlobSettings.ContainerName);
+            var blockBlob = container.GetBlockBlobReference(downloadBlockBlobSettings.BlobPath);
+            using (var memoryStream = new MemoryStream())
+            {
+                blockBlob.DownloadToStream(memoryStream);
+                return memoryStream;
             }
         }
 

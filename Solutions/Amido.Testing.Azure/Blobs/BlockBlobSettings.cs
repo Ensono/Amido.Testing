@@ -69,4 +69,13 @@
         /// </summary>
         public string StringData { get; set; }
     }
+
+    public class DownloadBlockBlobSettings
+    {
+        public string BlobStorage { get; set; }
+        public string BlobStorageKey { get; set; }
+        public bool UseHttps { get; set; }
+        public string ContainerName { get; set; }
+        public string BlobPath { get; set; }
+    }
 }
