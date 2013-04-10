@@ -64,7 +64,7 @@ namespace Amido.Testing.Azure
                     if (destBlob.CopyState == null)
                     {
                         Debug.WriteLine("BlobStorage.MonitorCopy: CopyState is null. Small sleep, then we assume it's done!");
-                        Thread.Sleep(4000);
+                        Thread.Sleep(5000);
                         return;
                     }
 
