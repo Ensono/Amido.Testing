@@ -16,10 +16,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amido.Testing.Azure", "Amid
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amido.Testing.WebApi", "Amido.Testing.WebApi\Amido.Testing.WebApi.csproj", "{67E3C019-B49E-4658-A7F2-76DFD739DE95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amido.Testing.SpecFlow", "Amido.Testing.SpecFlow\Amido.Testing.SpecFlow.csproj", "{DC14817D-398B-4790-9E5E-C2B25438F5D4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Amido.Testing.SpecFlow.Tests", "Amido.Testing.SpecFlow.Tests\Amido.Testing.SpecFlow.Tests.csproj", "{C331008C-29B3-4262-BEB0-182992D0FDCF}"
-EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Amido.Testing.vsmdi
@@ -45,14 +41,6 @@ Global
 		{67E3C019-B49E-4658-A7F2-76DFD739DE95}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67E3C019-B49E-4658-A7F2-76DFD739DE95}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67E3C019-B49E-4658-A7F2-76DFD739DE95}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DC14817D-398B-4790-9E5E-C2B25438F5D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DC14817D-398B-4790-9E5E-C2B25438F5D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DC14817D-398B-4790-9E5E-C2B25438F5D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DC14817D-398B-4790-9E5E-C2B25438F5D4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C331008C-29B3-4262-BEB0-182992D0FDCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C331008C-29B3-4262-BEB0-182992D0FDCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C331008C-29B3-4262-BEB0-182992D0FDCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C331008C-29B3-4262-BEB0-182992D0FDCF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

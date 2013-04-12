@@ -89,7 +89,7 @@ namespace Amido.Testing.Dbc
                 }
                 throw (TException)Activator.CreateInstance(exceptionType, message);
             }
-        } 
+       } 
 
         #endregion
 

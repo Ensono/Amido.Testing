@@ -25,8 +25,6 @@ namespace Amido.Testing.Tests
 
         public override void WebTestRequests()
         {
-            var comment = "not set";
-
             Requests
                 .Wait(2000, () =>
                                 {
@@ -47,7 +45,6 @@ namespace Amido.Testing.Tests
                          {
                              return new AssertActionValidationRule(r =>
                                                                        {
-                                                                           comment = string.Format("Demonstrating delegated response: {0}", r.ContentType);
                                                                            return new AssertActionResult(r.StatusCode == HttpStatusCode.OK,
                                                                                "The action was successful",
                                                                                "The action was not successful");
@@ -56,29 +53,15 @@ namespace Amido.Testing.Tests
                          }
                 )
                 .Retry(RetryTestType.StatusCodeEquals, 200, 2, 1000, () =>
-                {
-                    return WebApiRequest
-                        .Url("http://www.google.co.uk")
-                        .WithVerb(Verb.GET)
-                        .Create();
-                },
-                     () => { return new AssertStatusCodeValidationRule(200); },
-                     () => { return new AssertBodyIncludesValueValidationRule("google"); }
-                );
-
-            var unwantedText = Guid.NewGuid().ToString();
-            Requests
-                .Retry(RetryTestType.BodyDoesNotInclude, unwantedText, 2, 1000, () =>
                          {
                              return WebApiRequest
                                  .Url("http://www.google.co.uk")
                                  .WithVerb(Verb.GET)
                                  .Create();
                          },
-                     () => { return new AssertBodyDoesNotIncludeValueValidationRule(unwantedText); }
+                     () => { return new AssertStatusCodeValidationRule(200); },
+                     () => { return new AssertBodyIncludesValueValidationRule("google"); }
                 );
-
-            FinalOutput(() => { return comment; });
         }
     }
 }
