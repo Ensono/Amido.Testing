@@ -58,8 +58,8 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Http\RestClientTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WebApi\Routing\RouteTestTests.cs" />
     <Compile Include="TestHarness.cs" />
   </ItemGroup>
   <ItemGroup>

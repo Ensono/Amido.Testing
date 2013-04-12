@@ -14,21 +14,11 @@ namespace Amido.Testing.WebApi
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
-            routes.MapRoute(
-                name: "Default",
-                url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
-            );
-
-        }
-
-        public static void RegisterRoutes(HttpRouteCollection routes)
-        {
             routes.MapHttpRoute(
-               name: "DoAComplexPost",
-               routeTemplate: "api/doacomplexpost/{surname}",
-               defaults: new { controller = "RouteTest", action = "doacomplexpost" }
-           );
+              name: "DoAComplexPost",
+              routeTemplate: "api/doacomplexpost/{surname}",
+              defaults: new { controller = "RouteTest", action = "doacomplexpost" }
+          );
 
             routes.MapHttpRoute(
                name: "DoAPost",
@@ -42,8 +32,12 @@ namespace Amido.Testing.WebApi
                 defaults: new { id = RouteParameter.Optional }
             );
 
-           
-        }
+            routes.MapRoute(
+                name: "Default",
+                url: "{controller}/{action}/{id}",
+                defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
+            );
 
+        }
     }
 }

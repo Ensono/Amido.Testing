@@ -45,6 +45,7 @@ namespace Amido.Testing.WebApi.ValidationRules
                                                   expectedValue, (int)e.Response.StatusCode);
                     }
                     break;
+
                     case RetryTestType.BodyEquals:
                     if (e.Response.BodyString == expectedValue)
                     {
@@ -57,6 +58,7 @@ namespace Amido.Testing.WebApi.ValidationRules
                                                   expectedValue, e.Response.BodyString);
                     }
                     break;
+
                     case RetryTestType.BodyIncludes:
                     if (e.Response.BodyString.IndexOf(expectedValue, System.StringComparison.Ordinal) > -1)
                     {
@@ -67,6 +69,18 @@ namespace Amido.Testing.WebApi.ValidationRules
                         e.IsValid = false;
                         e.Message = string.Format("Body does not include expected value. Expected: {0} Actual: {1}",
                                                   expectedValue, e.Response.BodyString);
+                    }
+                    break;
+
+                    case RetryTestType.BodyDoesNotInclude:
+                    if (e.Response.BodyString.IndexOf(expectedValue, System.StringComparison.Ordinal) == -1)
+                    {
+                        e.Message = "Body correctly does not include unwanted value.";
+                    }
+                    else
+                    {
+                        e.IsValid = false;
+                        e.Message = string.Format("Body includes unwanted value: {0}", expectedValue);
                     }
                     break;
             }
