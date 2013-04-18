@@ -1,4 +1,6 @@
-﻿namespace Amido.Testing.Azure.Blobs
+﻿using System;
+
+namespace Amido.Testing.Azure.Blobs
 {
     /// <summary>
     /// The settings required for copying block blobs from one account and container to another.
@@ -77,5 +79,17 @@
         public bool UseHttps { get; set; }
         public string ContainerName { get; set; }
         public string BlobPath { get; set; }
+    }
+
+    public class LeaseBlockBlobSettings
+    {
+        public string BlobStorage { get; set; }
+        public string BlobStorageKey { get; set; }
+        public bool UseHttps { get; set; }
+        public string ContainerName { get; set; }
+        public string BlobPath { get; set; }
+        public TimeSpan? LeaseTime { get; set; }
+        public int RetryCount { get; set; }
+        public TimeSpan RetryInterval { get; set; }
     }
 }

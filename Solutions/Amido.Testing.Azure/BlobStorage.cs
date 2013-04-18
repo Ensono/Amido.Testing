@@ -1,6 +1,8 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using Amido.Testing.Azure.Blobs;
 using Amido.Testing.Dbc;
@@ -178,6 +180,41 @@ namespace Amido.Testing.Azure
             catch (StorageClientException ex)
             {
                 return false;
+            }
+        }
+
+        public static string AquireLease(LeaseBlockBlobSettings blobSettings)
+        {
+            var storageAccount = new CloudStorageAccount(new StorageCredentialsAccountAndKey(blobSettings.BlobStorage, blobSettings.BlobStorageKey), blobSettings.UseHttps);
+            var client = storageAccount.CreateCloudBlobClient();
+            var container = client.GetContainerReference(blobSettings.ContainerName);
+            var blob = container.GetBlobReference(blobSettings.BlobPath);
+
+            var retryCount = blobSettings.RetryCount;
+            var leaseId = blob.TryAcquireLease(blobSettings.LeaseTime);
+            while (leaseId == null && retryCount > 0)
+            {
+                Thread.Sleep(blobSettings.RetryInterval);
+                leaseId = blob.TryAcquireLease(blobSettings.LeaseTime);
+                retryCount++;
+            }
+            return leaseId;
+        }
+
+        private static string TryAcquireLease(this CloudBlob blob, TimeSpan? leaseTime)
+        {
+            try
+            {
+                return blob.AcquireLease(leaseTime, null);
+            }
+            catch (WebException e)
+            {
+                if ((e.Response == null) || ((HttpWebResponse)e.Response).StatusCode != HttpStatusCode.Conflict) // 409, already leased
+                {
+                    throw;
+                }
+                e.Response.Close();
+                return null;
             }
         }
     }
