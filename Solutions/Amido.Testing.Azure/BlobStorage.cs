@@ -185,11 +185,7 @@ namespace Amido.Testing.Azure
 
         public static string AquireLease(LeaseBlockBlobSettings blobSettings)
         {
-            var storageAccount = new CloudStorageAccount(new StorageCredentialsAccountAndKey(blobSettings.BlobStorage, blobSettings.BlobStorageKey), blobSettings.UseHttps);
-            var client = storageAccount.CreateCloudBlobClient();
-            var container = client.GetContainerReference(blobSettings.ContainerName);
-            var blob = container.GetBlobReference(blobSettings.BlobPath);
-
+            var blob = GetBlobReference(blobSettings);
             var retryCount = blobSettings.RetryCount;
             var leaseId = blob.TryAcquireLease(blobSettings.LeaseTime);
             while (leaseId == null && retryCount > 0)
@@ -199,6 +195,20 @@ namespace Amido.Testing.Azure
                 retryCount++;
             }
             return leaseId;
+        }
+
+        public static void ReleaseLease(LeaseBlockBlobSettings blobSettings, string leaseId)
+        {
+            var blob = GetBlobReference(blobSettings);
+            blob.ReleaseLease(AccessCondition.GenerateLeaseCondition(leaseId));
+        }
+
+        private static CloudBlob GetBlobReference(LeaseBlockBlobSettings blobSettings)
+        {
+            var storageAccount = new CloudStorageAccount(new StorageCredentialsAccountAndKey(blobSettings.BlobStorage, blobSettings.BlobStorageKey), blobSettings.UseHttps);
+            var client = storageAccount.CreateCloudBlobClient();
+            var container = client.GetContainerReference(blobSettings.ContainerName);
+            return container.GetBlobReference(blobSettings.BlobPath);
         }
 
         private static string TryAcquireLease(this CloudBlob blob, TimeSpan? leaseTime)
