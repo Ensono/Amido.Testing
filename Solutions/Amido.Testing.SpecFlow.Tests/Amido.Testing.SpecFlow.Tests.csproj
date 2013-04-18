@@ -53,6 +53,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>LoggingTest.feature</DependentUpon>
     </Compile>
+    <Compile Include="Http\RestClientExtensionsTests.feature.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RestClientExtensionsTests.feature</DependentUpon>
+    </Compile>
     <Compile Include="Http\SimpleTestRequests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -37,7 +37,6 @@ StyleCop.Cache
 *.vsp
 *.app.ctl
 *.krn.ctl
-*.feature.cs
 #Ignore Files left over from merge conflicts
 *.orig
 *.VisualState.xml
