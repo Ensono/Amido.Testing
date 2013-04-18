@@ -187,12 +187,12 @@ namespace Amido.Testing.Azure
         {
             var blob = GetBlobReference(blobSettings);
             var retryCount = blobSettings.RetryCount;
-            var leaseId = blob.TryAcquireLease(blobSettings.LeaseTime);
+            var leaseId = blob.TryAcquireLease();
             while (leaseId == null && retryCount > 0)
             {
                 Thread.Sleep(blobSettings.RetryInterval);
-                leaseId = blob.TryAcquireLease(blobSettings.LeaseTime);
-                retryCount++;
+                leaseId = blob.TryAcquireLease();
+                retryCount--;
             }
             return leaseId;
         }
@@ -205,25 +205,28 @@ namespace Amido.Testing.Azure
 
         private static CloudBlob GetBlobReference(LeaseBlockBlobSettings blobSettings)
         {
-            var storageAccount = new CloudStorageAccount(new StorageCredentialsAccountAndKey(blobSettings.BlobStorage, blobSettings.BlobStorageKey), blobSettings.UseHttps);
+            var storageAccount = blobSettings.ConnectionString == null 
+                ? new CloudStorageAccount(new StorageCredentialsAccountAndKey(blobSettings.BlobStorage, blobSettings.BlobStorageKey), blobSettings.UseHttps) 
+                : CloudStorageAccount.Parse(blobSettings.ConnectionString);
             var client = storageAccount.CreateCloudBlobClient();
             var container = client.GetContainerReference(blobSettings.ContainerName);
             return container.GetBlobReference(blobSettings.BlobPath);
         }
 
-        private static string TryAcquireLease(this CloudBlob blob, TimeSpan? leaseTime)
+        private static string TryAcquireLease(this CloudBlob blob)
         {
             try
             {
-                return blob.AcquireLease(leaseTime, null);
+                return blob.AcquireLease(null, null);
             }
-            catch (WebException e)
+            catch (StorageClientException storageException)
             {
-                if ((e.Response == null) || ((HttpWebResponse)e.Response).StatusCode != HttpStatusCode.Conflict) // 409, already leased
+                var webException = storageException.InnerException as WebException;
+                if (webException == null || webException.Response == null || ((HttpWebResponse)webException.Response).StatusCode != HttpStatusCode.Conflict) // 409, already leased
                 {
                     throw;
                 }
-                e.Response.Close();
+                webException.Response.Close();
                 return null;
             }
         }

@@ -85,10 +85,10 @@ namespace Amido.Testing.Azure.Blobs
     {
         public string BlobStorage { get; set; }
         public string BlobStorageKey { get; set; }
+        public string ConnectionString { get; set; }
         public bool UseHttps { get; set; }
         public string ContainerName { get; set; }
         public string BlobPath { get; set; }
-        public TimeSpan? LeaseTime { get; set; }
         public int RetryCount { get; set; }
         public TimeSpan RetryInterval { get; set; }
     }
