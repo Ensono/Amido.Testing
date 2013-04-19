@@ -8,7 +8,7 @@ using NUnit.Framework;
 
 namespace Amido.Testing.Tests.Azure
 {
-    public class BlobStorageTests
+    public abstract class BlobStorageTests
     {
         private CloudBlob leaseBlob;
         private CloudBlobContainer container;
