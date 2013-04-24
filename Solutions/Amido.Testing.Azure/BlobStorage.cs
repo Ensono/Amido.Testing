@@ -16,6 +16,8 @@ namespace Amido.Testing.Azure
     /// </summary>
     public static class BlobStorage
     {
+        private static Thread renewalThread;
+
         /// <summary>
         /// Copies a blob from one account and container to another.
         /// </summary>
@@ -183,15 +185,15 @@ namespace Amido.Testing.Azure
             }
         }
 
-        public static string AquireLease(LeaseBlockBlobSettings blobSettings)
+        public static string AquireLease(LeaseBlockBlobSettings blobSettings, int maximumStopDurationEstimateSeconds)
         {
             var blob = GetBlobReference(blobSettings);
             var retryCount = blobSettings.RetryCount;
-            var leaseId = blob.TryAcquireLease();
+            var leaseId = blob.TryAcquireLease(maximumStopDurationEstimateSeconds);
             while (leaseId == null && retryCount > 0)
             {
                 Thread.Sleep(blobSettings.RetryInterval);
-                leaseId = blob.TryAcquireLease();
+                leaseId = blob.TryAcquireLease(maximumStopDurationEstimateSeconds);
                 retryCount--;
             }
             return leaseId;
@@ -199,8 +201,19 @@ namespace Amido.Testing.Azure
 
         public static void ReleaseLease(LeaseBlockBlobSettings blobSettings, string leaseId)
         {
+            if (renewalThread != null)
+            {
+                renewalThread.Abort();
+                renewalThread = null;
+            }
             var blob = GetBlobReference(blobSettings);
-            blob.ReleaseLease(AccessCondition.GenerateLeaseCondition(leaseId));
+            try
+            {
+                blob.ReleaseLease(AccessCondition.GenerateLeaseCondition(leaseId));
+            }
+            catch
+            {
+            }
         }
 
         private static CloudBlob GetBlobReference(LeaseBlockBlobSettings blobSettings)
@@ -213,11 +226,16 @@ namespace Amido.Testing.Azure
             return container.GetBlobReference(blobSettings.BlobPath);
         }
 
-        private static string TryAcquireLease(this CloudBlob blob)
+        private static string TryAcquireLease(this CloudBlob blob, int maximumStopDurationEstimateSeconds)
         {
             try
             {
-                return blob.AcquireLease(null, null);
+                var leaseId = blob.AcquireLease(TimeSpan.FromSeconds(35), null);
+
+                renewalThread = new Thread(() => AutoRenewLease(blob, leaseId, maximumStopDurationEstimateSeconds));
+                renewalThread.Start();
+
+                return leaseId;
             }
             catch (StorageClientException storageException)
             {
@@ -228,6 +246,33 @@ namespace Amido.Testing.Azure
                 }
                 webException.Response.Close();
                 return null;
+            }
+        }
+
+        private static void AutoRenewLease(CloudBlob blob, string leaseId, int maximumStopDurationEstimateSeconds)
+        {
+            try
+            {
+                const int sleepSeconds = 10;
+                var totalSleepSeconds = 0;
+                while (true)
+                {
+                    Thread.Sleep(TimeSpan.FromSeconds(sleepSeconds));
+                    totalSleepSeconds += sleepSeconds;
+                    if (totalSleepSeconds >= maximumStopDurationEstimateSeconds)
+                        break;
+                    blob.RenewLease(AccessCondition.GenerateLeaseCondition(leaseId), null);
+                }
+            }
+            finally
+            {
+                try
+                {
+                    blob.ReleaseLease(AccessCondition.GenerateLeaseCondition(leaseId));
+                }
+                catch
+                {
+                }
             }
         }
     }

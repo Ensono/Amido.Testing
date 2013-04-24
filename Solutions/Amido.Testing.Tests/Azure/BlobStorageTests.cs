@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading;
 using Amido.Testing.Azure;
 using Amido.Testing.Azure.Blobs;
 using Microsoft.WindowsAzure;
@@ -13,6 +14,7 @@ namespace Amido.Testing.Tests.Azure
         private CloudBlob leaseBlob;
         private CloudBlobContainer container;
         private LeaseBlockBlobSettings blobSettings;
+        private int maximumStopDurationEstimateSeconds;
 
         [SetUp]
         public void SetUp()
@@ -25,6 +27,7 @@ namespace Amido.Testing.Tests.Azure
                 RetryCount = 2,
                 RetryInterval = TimeSpan.FromMilliseconds(250)
             };
+            maximumStopDurationEstimateSeconds = 8;
             var storageAccount = CloudStorageAccount.Parse("UseDevelopmentStorage=true");
             var client = storageAccount.CreateCloudBlobClient();
             container = client.GetContainerReference(blobSettings.ContainerName);
@@ -36,6 +39,13 @@ namespace Amido.Testing.Tests.Azure
         [TearDown]
         public void TearDown()
         {
+            try
+            {
+                leaseBlob.BreakLease(TimeSpan.FromSeconds(1));
+            }
+            catch
+            {
+            }
             container.Delete();
         }
 
@@ -45,13 +55,47 @@ namespace Amido.Testing.Tests.Azure
             [SetUp]
             public void BecauseOf()
             {
-                BlobStorage.AquireLease(blobSettings);
+                BlobStorage.AquireLease(blobSettings, maximumStopDurationEstimateSeconds);
             }
 
             [Test]
             public void It_should_prevent_a_new_lease_being_aquired()
             {
                 Assert.Throws<StorageClientException>(() => leaseBlob.AcquireLease(null, null));
+            }
+        }
+
+        [TestFixture]
+        public class When_successfully_aquiring_the_lease_and_waiting_less_than_the_maximum_stop_duration : BlobStorageTests
+        {
+            [SetUp]
+            public void BecauseOf()
+            {
+                BlobStorage.AquireLease(blobSettings, maximumStopDurationEstimateSeconds);
+                Thread.Sleep(TimeSpan.FromSeconds(7));
+            }
+
+            [Test]
+            public void It_should_release_the_lease()
+            {
+                Assert.Throws<StorageClientException>(() => leaseBlob.AcquireLease(null, null));
+            }
+        }
+
+        [TestFixture]
+        public class When_successfully_aquiring_the_lease_and_waiting_more_than_the_maximum_stop_duration : BlobStorageTests
+        {
+            [SetUp]
+            public void BecauseOf()
+            {
+                BlobStorage.AquireLease(blobSettings, maximumStopDurationEstimateSeconds);
+                Thread.Sleep(TimeSpan.FromSeconds(12));
+            }
+
+            [Test]
+            public void It_should_release_the_lease()
+            {
+                leaseBlob.AcquireLease(null, null);
             }
         }
 
@@ -67,7 +111,7 @@ namespace Amido.Testing.Tests.Azure
             [Test]
             public void It_should_not_create_a_lease_id()
             {
-                var leaseId = BlobStorage.AquireLease(blobSettings);
+                var leaseId = BlobStorage.AquireLease(blobSettings, maximumStopDurationEstimateSeconds);
                 Assert.IsNull(leaseId);
             }
         }
@@ -78,7 +122,7 @@ namespace Amido.Testing.Tests.Azure
             [SetUp]
             public void BecauseOf()
             {
-                var leaseId = BlobStorage.AquireLease(blobSettings);
+                var leaseId = BlobStorage.AquireLease(blobSettings, maximumStopDurationEstimateSeconds);
                 BlobStorage.ReleaseLease(blobSettings, leaseId);
             }
 
@@ -87,6 +131,25 @@ namespace Amido.Testing.Tests.Azure
             {
                 var leaseId = leaseBlob.AcquireLease(null, null);
                 Assert.IsNotNull(leaseId);
+            }
+        }
+
+        [TestFixture]
+        public class When_releasing_the_lease_twice : BlobStorageTests
+        {
+            private string leaseId;
+
+            [SetUp]
+            public void BecauseOf()
+            {
+                leaseId = BlobStorage.AquireLease(blobSettings, maximumStopDurationEstimateSeconds);
+                BlobStorage.ReleaseLease(blobSettings, leaseId);
+            }
+
+            [Test]
+            public void It_should_not_throw()
+            {
+                Assert.DoesNotThrow(() => BlobStorage.ReleaseLease(blobSettings, leaseId));
             }
         }
     }
