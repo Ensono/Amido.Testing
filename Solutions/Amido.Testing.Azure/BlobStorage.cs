@@ -17,6 +17,7 @@ namespace Amido.Testing.Azure
     public static class BlobStorage
     {
         private static Thread renewalThread;
+        private static BlobRequestOptions leaseRequestTimeout = new BlobRequestOptions { Timeout = TimeSpan.FromSeconds(1) };
 
         /// <summary>
         /// Copies a blob from one account and container to another.
@@ -201,15 +202,22 @@ namespace Amido.Testing.Azure
 
         public static void ReleaseLease(LeaseBlockBlobSettings blobSettings, string leaseId)
         {
-            if (renewalThread != null)
+            try
             {
-                renewalThread.Abort();
-                renewalThread = null;
+                if (renewalThread != null)
+                {
+                    renewalThread.Abort();
+                }
             }
+            catch (ThreadAbortException ex)
+            {
+                Console.WriteLine(ex);
+            }
+            renewalThread = null;
             var blob = GetBlobReference(blobSettings);
             try
             {
-                blob.ReleaseLease(AccessCondition.GenerateLeaseCondition(leaseId));
+                blob.ReleaseLease(AccessCondition.GenerateLeaseCondition(leaseId), leaseRequestTimeout);
             }
             catch
             {
@@ -230,7 +238,7 @@ namespace Amido.Testing.Azure
         {
             try
             {
-                var leaseId = blob.AcquireLease(TimeSpan.FromSeconds(35), null);
+                var leaseId = blob.AcquireLease(TimeSpan.FromSeconds(35), null, AccessCondition.GenerateEmptyCondition(), leaseRequestTimeout);
 
                 renewalThread = new Thread(() => AutoRenewLease(blob, leaseId, maximumStopDurationEstimateSeconds));
                 renewalThread.Start();
@@ -261,14 +269,17 @@ namespace Amido.Testing.Azure
                     totalSleepSeconds += sleepSeconds;
                     if (totalSleepSeconds >= maximumStopDurationEstimateSeconds)
                         break;
-                    blob.RenewLease(AccessCondition.GenerateLeaseCondition(leaseId), null);
+                    blob.RenewLease(AccessCondition.GenerateLeaseCondition(leaseId), leaseRequestTimeout);
                 }
+            }
+            catch
+            {
             }
             finally
             {
                 try
                 {
-                    blob.ReleaseLease(AccessCondition.GenerateLeaseCondition(leaseId));
+                    blob.ReleaseLease(AccessCondition.GenerateLeaseCondition(leaseId), leaseRequestTimeout);
                 }
                 catch
                 {

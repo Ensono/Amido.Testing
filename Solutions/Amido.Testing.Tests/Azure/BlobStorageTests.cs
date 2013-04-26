@@ -27,7 +27,7 @@ namespace Amido.Testing.Tests.Azure
                 RetryCount = 2,
                 RetryInterval = TimeSpan.FromMilliseconds(250)
             };
-            maximumStopDurationEstimateSeconds = 8;
+            maximumStopDurationEstimateSeconds = 10;
             var storageAccount = CloudStorageAccount.Parse("UseDevelopmentStorage=true");
             var client = storageAccount.CreateCloudBlobClient();
             container = client.GetContainerReference(blobSettings.ContainerName);
@@ -41,7 +41,7 @@ namespace Amido.Testing.Tests.Azure
         {
             try
             {
-                leaseBlob.BreakLease(TimeSpan.FromSeconds(1));
+                leaseBlob.BreakLease(TimeSpan.Zero);
             }
             catch
             {
@@ -72,11 +72,11 @@ namespace Amido.Testing.Tests.Azure
             public void BecauseOf()
             {
                 BlobStorage.AquireLease(blobSettings, maximumStopDurationEstimateSeconds);
-                Thread.Sleep(TimeSpan.FromSeconds(7));
+                Thread.Sleep(TimeSpan.FromSeconds(9));
             }
 
             [Test]
-            public void It_should_release_the_lease()
+            public void It_should_still_own_the_lease()
             {
                 Assert.Throws<StorageClientException>(() => leaseBlob.AcquireLease(null, null));
             }
