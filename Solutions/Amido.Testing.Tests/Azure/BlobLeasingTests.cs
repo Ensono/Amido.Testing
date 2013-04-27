@@ -9,7 +9,7 @@ using NUnit.Framework;
 
 namespace Amido.Testing.Tests.Azure
 {
-    public abstract class BlobStorageTests
+    public abstract class BlobLeasingTests
     {
         private CloudBlob leaseBlob;
         private CloudBlobContainer container;
@@ -50,7 +50,7 @@ namespace Amido.Testing.Tests.Azure
         }
 
         [TestFixture]
-        public class When_successfully_aquiring_the_lease : BlobStorageTests
+        public class When_successfully_aquiring_the_lease : BlobLeasingTests
         {
             [SetUp]
             public void BecauseOf()
@@ -66,7 +66,7 @@ namespace Amido.Testing.Tests.Azure
         }
 
         [TestFixture]
-        public class When_successfully_aquiring_the_lease_and_waiting_less_than_the_maximum_stop_duration : BlobStorageTests
+        public class When_successfully_aquiring_the_lease_and_waiting_less_than_the_maximum_stop_duration : BlobLeasingTests
         {
             [SetUp]
             public void BecauseOf()
@@ -83,7 +83,7 @@ namespace Amido.Testing.Tests.Azure
         }
 
         [TestFixture]
-        public class When_successfully_aquiring_the_lease_and_waiting_more_than_the_maximum_stop_duration : BlobStorageTests
+        public class When_successfully_aquiring_the_lease_and_waiting_more_than_the_maximum_stop_duration : BlobLeasingTests
         {
             [SetUp]
             public void BecauseOf()
@@ -100,7 +100,7 @@ namespace Amido.Testing.Tests.Azure
         }
 
         [TestFixture]
-        public class When_failing_to_aquiring_the_lease : BlobStorageTests
+        public class When_failing_to_aquiring_the_lease : BlobLeasingTests
         {
             [SetUp]
             public void BecauseOf()
@@ -117,7 +117,7 @@ namespace Amido.Testing.Tests.Azure
         }
 
         [TestFixture]
-        public class When_releasing_the_lease : BlobStorageTests
+        public class When_releasing_the_lease : BlobLeasingTests
         {
             [SetUp]
             public void BecauseOf()
@@ -135,7 +135,7 @@ namespace Amido.Testing.Tests.Azure
         }
 
         [TestFixture]
-        public class When_releasing_the_lease_twice : BlobStorageTests
+        public class When_releasing_the_lease_twice : BlobLeasingTests
         {
             private string leaseId;
 

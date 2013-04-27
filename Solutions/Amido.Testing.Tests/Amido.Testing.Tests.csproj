@@ -65,7 +65,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Azure\BlobStorageTests.cs" />
+    <Compile Include="Azure\BlobLeasingTests.cs" />
     <Compile Include="Http\RestClientTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestHarness.cs" />
