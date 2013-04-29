@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using Amido.Testing.Azure.Blobs;
 using Amido.Testing.Dbc;
 using Microsoft.WindowsAzure;
@@ -16,8 +17,9 @@ namespace Amido.Testing.Azure
     /// </summary>
     public static class BlobStorage
     {
-        private static Thread renewalThread;
         private static BlobRequestOptions leaseRequestTimeout = new BlobRequestOptions { Timeout = TimeSpan.FromSeconds(1) };
+        private static Task leasingTask;
+        private static CancellationTokenSource cancellationTokenSource;
 
         /// <summary>
         /// Copies a blob from one account and container to another.
@@ -202,18 +204,8 @@ namespace Amido.Testing.Azure
 
         public static void ReleaseLease(LeaseBlockBlobSettings blobSettings, string leaseId)
         {
-            try
-            {
-                if (renewalThread != null)
-                {
-                    renewalThread.Abort();
-                }
-            }
-            catch (ThreadAbortException ex)
-            {
-                Console.WriteLine(ex);
-            }
-            renewalThread = null;
+            cancellationTokenSource.Cancel();
+            leasingTask.Wait();
             var blob = GetBlobReference(blobSettings);
             try
             {
@@ -240,9 +232,11 @@ namespace Amido.Testing.Azure
             {
                 var leaseId = blob.AcquireLease(TimeSpan.FromSeconds(35), null, AccessCondition.GenerateEmptyCondition(), leaseRequestTimeout);
 
-                renewalThread = new Thread(() => AutoRenewLease(blob, leaseId, maximumStopDurationEstimateSeconds));
-                renewalThread.Start();
+                cancellationTokenSource = new CancellationTokenSource();
+                var cancellationToken = cancellationTokenSource.Token;
 
+                leasingTask = Task.Factory.StartNew(t => AutoRenewLease(blob, leaseId, maximumStopDurationEstimateSeconds, cancellationToken), cancellationToken, TaskCreationOptions.LongRunning);
+                
                 return leaseId;
             }
             catch (StorageClientException storageException)
@@ -257,7 +251,7 @@ namespace Amido.Testing.Azure
             }
         }
 
-        private static void AutoRenewLease(CloudBlob blob, string leaseId, int maximumStopDurationEstimateSeconds)
+        private static void AutoRenewLease(CloudBlob blob, string leaseId, int maximumStopDurationEstimateSeconds, CancellationToken cancellationToken)
         {
             try
             {
@@ -265,7 +259,12 @@ namespace Amido.Testing.Azure
                 var totalSleepSeconds = 0;
                 while (true)
                 {
-                    Thread.Sleep(TimeSpan.FromSeconds(sleepSeconds));
+                    for (var i = 0; i < sleepSeconds; i++ )
+                    {
+                        Thread.Sleep(TimeSpan.FromSeconds(1));
+                        if (cancellationToken.IsCancellationRequested)
+                            break;
+                    }
                     totalSleepSeconds += sleepSeconds;
                     if (totalSleepSeconds >= maximumStopDurationEstimateSeconds)
                         break;
