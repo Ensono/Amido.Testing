@@ -89,6 +89,7 @@ namespace Amido.Testing.Azure.Blobs
         public bool UseHttps { get; set; }
         public string ContainerName { get; set; }
         public string BlobPath { get; set; }
+        public bool ReAquirePreviousTestLease { get; set; }
         public int RetryCount { get; set; }
         public TimeSpan RetryInterval { get; set; }
     }

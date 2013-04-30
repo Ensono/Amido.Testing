@@ -25,6 +25,7 @@ namespace Amido.Testing.Tests.Azure
                 ConnectionString = "UseDevelopmentStorage=true",
                 ContainerName = "test" + Guid.NewGuid().ToString("N"),
                 BlobPath = "lease.blob",
+                ReAquirePreviousTestLease = false,
                 RetryCount = 2,
                 RetryInterval = TimeSpan.FromMilliseconds(250)
             };
@@ -74,7 +75,40 @@ namespace Amido.Testing.Tests.Azure
         }
 
         [TestFixture]
-        public class When_successfully_aquiring_the_lease_twice : BlobLeasingTests
+        public class When_successfully_aquiring_the_lease_twice_allowing_test_lease_to_be_ignored : BlobLeasingTests
+        {
+            private string leaseId;
+
+            [SetUp]
+            public void BecauseOf()
+            {
+                BlobStorage.AquireLease(blobSettings, maximumStopDurationEstimateSeconds);
+                blobSettings.ReAquirePreviousTestLease = true;
+                leaseId = BlobStorage.AquireLease(blobSettings, maximumStopDurationEstimateSeconds);
+                leaseBlob.FetchAttributes();
+            }
+
+            [Test]
+            public void It_should_prevent_a_new_lease_being_aquired()
+            {
+                Assert.Throws<StorageClientException>(() => leaseBlob.AcquireLease(null, null));
+            }
+
+            [Test]
+            public void It_should_aquire_the_lease()
+            {
+                Assert.IsNotNull(leaseId);
+            }
+
+            [Test]
+            public void It_should_have_the_test_lease_metadata()
+            {
+                Assert.IsTrue(leaseBlob.Metadata.AllKeys.Contains("leased_for_test"));
+            }
+        }
+
+        [TestFixture]
+        public class When_successfully_aquiring_the_lease_twice_preventing_test_lease_to_be_ignored : BlobLeasingTests
         {
             private string leaseId;
 
@@ -93,11 +127,10 @@ namespace Amido.Testing.Tests.Azure
             }
 
             [Test]
-            public void It_should_aquire_the_lease()
+            public void It_should_not_aquire_the_lease()
             {
-                Assert.IsNotNull(leaseId);
+                Assert.IsNull(leaseId);
             }
-
 
             [Test]
             public void It_should_have_the_test_lease_metadata()

@@ -198,7 +198,8 @@ namespace Amido.Testing.Azure
         {
             var blob = GetBlobReference(blobSettings);
 
-            BreakTestLeaseIfExists(blob);
+            if (blobSettings.ReAquirePreviousTestLease)
+                BreakTestLeaseIfExists(blob);
 
             var retryCount = blobSettings.RetryCount;
             var leaseId = blob.TryAcquireLease(maximumStopDurationEstimateSeconds);
