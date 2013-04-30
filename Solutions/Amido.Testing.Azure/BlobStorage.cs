@@ -20,6 +20,12 @@ namespace Amido.Testing.Azure
         private static BlobRequestOptions leaseRequestTimeout = new BlobRequestOptions { Timeout = TimeSpan.FromSeconds(1) };
         private static Task leasingTask;
         private static CancellationTokenSource cancellationTokenSource;
+        private static string leasedForTestTag;
+
+        static BlobStorage()
+        {
+            leasedForTestTag = "leased_for_test";
+        }
 
         /// <summary>
         /// Copies a blob from one account and container to another.
@@ -191,6 +197,9 @@ namespace Amido.Testing.Azure
         public static string AquireLease(LeaseBlockBlobSettings blobSettings, int maximumStopDurationEstimateSeconds)
         {
             var blob = GetBlobReference(blobSettings);
+
+            BreakTestLeaseIfExists(blob);
+
             var retryCount = blobSettings.RetryCount;
             var leaseId = blob.TryAcquireLease(maximumStopDurationEstimateSeconds);
             while (leaseId == null && retryCount > 0)
@@ -214,6 +223,10 @@ namespace Amido.Testing.Azure
             catch
             {
             }
+            finally
+            {
+                BreakLease(blob);
+            }
         }
 
         private static CloudBlob GetBlobReference(LeaseBlockBlobSettings blobSettings)
@@ -231,6 +244,8 @@ namespace Amido.Testing.Azure
             try
             {
                 var leaseId = blob.AcquireLease(TimeSpan.FromSeconds(35), null, AccessCondition.GenerateEmptyCondition(), leaseRequestTimeout);
+                blob.Metadata[leasedForTestTag] = "True";
+                blob.SetMetadata(AccessCondition.GenerateLeaseCondition(leaseId), leaseRequestTimeout);
 
                 cancellationTokenSource = new CancellationTokenSource();
                 var cancellationToken = cancellationTokenSource.Token;
@@ -244,6 +259,7 @@ namespace Amido.Testing.Azure
                 var webException = storageException.InnerException as WebException;
                 if (webException == null || webException.Response == null || ((HttpWebResponse)webException.Response).StatusCode != HttpStatusCode.Conflict) // 409, already leased
                 {
+                    BreakLease(blob);
                     throw;
                 }
                 webException.Response.Close();
@@ -278,11 +294,37 @@ namespace Amido.Testing.Azure
             {
                 try
                 {
-                    blob.ReleaseLease(AccessCondition.GenerateLeaseCondition(leaseId), leaseRequestTimeout);
+                    BreakLease(blob);
                 }
                 catch
                 {
                 }
+            }
+        }
+
+        private static void BreakTestLeaseIfExists(CloudBlob blob)
+        {
+            blob.FetchAttributes();
+            if (blob.Metadata.AllKeys.Contains(leasedForTestTag))
+                BreakLease(blob);
+        }
+
+        private static void BreakLease(CloudBlob blob)
+        {
+            try
+            {
+                blob.BreakLease(TimeSpan.Zero);
+            }
+            catch
+            {
+            }
+            try
+            {
+                blob.Metadata.Remove(leasedForTestTag);
+                blob.SetMetadata();
+            }
+            catch
+            {
             }
         }
     }

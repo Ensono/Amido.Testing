@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using Amido.Testing.Azure;
 using Amido.Testing.Azure.Blobs;
@@ -56,12 +57,52 @@ namespace Amido.Testing.Tests.Azure
             public void BecauseOf()
             {
                 BlobStorage.AquireLease(blobSettings, maximumStopDurationEstimateSeconds);
+                leaseBlob.FetchAttributes();
             }
 
             [Test]
             public void It_should_prevent_a_new_lease_being_aquired()
             {
                 Assert.Throws<StorageClientException>(() => leaseBlob.AcquireLease(null, null));
+            }
+
+            [Test]
+            public void It_should_have_the_test_lease_metadata()
+            {
+                Assert.IsTrue(leaseBlob.Metadata.AllKeys.Contains("leased_for_test"));
+            }
+        }
+
+        [TestFixture]
+        public class When_successfully_aquiring_the_lease_twice : BlobLeasingTests
+        {
+            private string leaseId;
+
+            [SetUp]
+            public void BecauseOf()
+            {
+                BlobStorage.AquireLease(blobSettings, maximumStopDurationEstimateSeconds);
+                leaseId = BlobStorage.AquireLease(blobSettings, maximumStopDurationEstimateSeconds);
+                leaseBlob.FetchAttributes();
+            }
+
+            [Test]
+            public void It_should_prevent_a_new_lease_being_aquired()
+            {
+                Assert.Throws<StorageClientException>(() => leaseBlob.AcquireLease(null, null));
+            }
+
+            [Test]
+            public void It_should_aquire_the_lease()
+            {
+                Assert.IsNotNull(leaseId);
+            }
+
+
+            [Test]
+            public void It_should_have_the_test_lease_metadata()
+            {
+                Assert.IsTrue(leaseBlob.Metadata.AllKeys.Contains("leased_for_test"));
             }
         }
 
@@ -73,12 +114,14 @@ namespace Amido.Testing.Tests.Azure
             {
                 BlobStorage.AquireLease(blobSettings, maximumStopDurationEstimateSeconds);
                 Thread.Sleep(TimeSpan.FromSeconds(9));
+                leaseBlob.FetchAttributes();
             }
 
             [Test]
-            public void It_should_still_own_the_lease()
+            public void It_should_still_own_the_lease_and_have_the_test_lease_metadata()
             {
                 Assert.Throws<StorageClientException>(() => leaseBlob.AcquireLease(null, null));
+                Assert.IsTrue(leaseBlob.Metadata.AllKeys.Contains("leased_for_test"));
             }
         }
 
@@ -90,11 +133,13 @@ namespace Amido.Testing.Tests.Azure
             {
                 BlobStorage.AquireLease(blobSettings, maximumStopDurationEstimateSeconds);
                 Thread.Sleep(TimeSpan.FromSeconds(12));
+                leaseBlob.FetchAttributes();
             }
 
             [Test]
-            public void It_should_release_the_lease()
+            public void It_should_release_the_lease_and_not_have_the_test_lease_metadata()
             {
+                Assert.IsFalse(leaseBlob.Metadata.AllKeys.Contains("leased_for_test"));
                 leaseBlob.AcquireLease(null, null);
             }
         }
@@ -106,6 +151,7 @@ namespace Amido.Testing.Tests.Azure
             public void BecauseOf()
             {
                 leaseBlob.AcquireLease(null, null);
+                leaseBlob.FetchAttributes();
             }
 
             [Test]
@@ -113,6 +159,12 @@ namespace Amido.Testing.Tests.Azure
             {
                 var leaseId = BlobStorage.AquireLease(blobSettings, maximumStopDurationEstimateSeconds);
                 Assert.IsNull(leaseId);
+            }
+
+            [Test]
+            public void It_should_not_have_the_test_lease_metadata()
+            {
+                Assert.IsFalse(leaseBlob.Metadata.AllKeys.Contains("leased_for_test"));
             }
         }
 
@@ -124,6 +176,7 @@ namespace Amido.Testing.Tests.Azure
             {
                 var leaseId = BlobStorage.AquireLease(blobSettings, maximumStopDurationEstimateSeconds);
                 BlobStorage.ReleaseLease(blobSettings, leaseId);
+                leaseBlob.FetchAttributes();
             }
 
             [Test]
@@ -131,6 +184,12 @@ namespace Amido.Testing.Tests.Azure
             {
                 var leaseId = leaseBlob.AcquireLease(null, null);
                 Assert.IsNotNull(leaseId);
+            }
+
+            [Test]
+            public void It_should_not_have_the_test_lease_metadata()
+            {
+                Assert.IsFalse(leaseBlob.Metadata.AllKeys.Contains("leased_for_test"));
             }
         }
 
