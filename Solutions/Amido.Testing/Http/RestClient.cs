@@ -228,38 +228,41 @@ namespace Amido.Testing.Http
             {
                 var httpRequestMessage = httpRequestMessageList[currentRetryIndex];
 
+                httpRequestMessage.RequestUri = new Uri(url);
+
+                if (!string.IsNullOrWhiteSpace(contentTypeString))
+                {
+                    if (contentTypeString == "application/x-www-form-urlencoded")
+                    {
+                        httpRequestMessage.Content = new FormUrlEncodedContent(formParameters);
+                    }
+
+                    if (httpRequestMessage.Content != null)
+                    {
+                        httpRequestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue(contentTypeString);
+                    }
+                }
+
+                WriteRequestToDebugWindow(currentRetryIndex, MaxRetries, httpRequestMessage);
+
                 using (var httpClient = new HttpClient())
                 {
-                    httpRequestMessage.RequestUri = new Uri(url);
-
-                    if (!string.IsNullOrWhiteSpace(contentTypeString))
-                    {
-                        if (contentTypeString == "application/x-www-form-urlencoded")
-                        {
-                            httpRequestMessage.Content = new FormUrlEncodedContent(formParameters);
-                        }
-
-                        if (httpRequestMessage.Content != null)
-                        {
-                            httpRequestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue(contentTypeString);
-                        }
-                    }
-
-                    WriteRequestToDebugWindow(currentRetryIndex, MaxRetries, httpRequestMessage);
-
+                    // Increased timeout from default 100 seconds as randomly (but frquently) timing out. 
+                    // May be connectivity in Brighton so remove when new connection on-line.
+                    httpClient.Timeout = TimeSpan.FromMinutes(5);
                     httpResponseMessage = httpClient.SendAsync(httpRequestMessage).Result;
+                }
 
-                    WriteResponseToDebugWindow(currentRetryIndex, MaxRetries, httpResponseMessage);
+                WriteResponseToDebugWindow(currentRetryIndex, MaxRetries, httpResponseMessage);
 
-                    if(IsFinalRetryRequest(currentRetryIndex))
-                    {
-                        return httpResponseMessage;
-                    }
+                if(IsFinalRetryRequest(currentRetryIndex))
+                {
+                    return httpResponseMessage;
+                }
 
-                    if (IsRetryConditionSatisfied(httpResponseMessage, RetryType, RetryParameter))
-                    {
-                        return httpResponseMessage;
-                    }
+                if (IsRetryConditionSatisfied(httpResponseMessage, RetryType, RetryParameter))
+                {
+                    return httpResponseMessage;
                 }
 
                 Thread.Sleep(Interval);
