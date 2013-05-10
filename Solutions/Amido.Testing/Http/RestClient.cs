@@ -247,9 +247,6 @@ namespace Amido.Testing.Http
 
                 using (var httpClient = new HttpClient())
                 {
-                    // Increased timeout from default 100 seconds as randomly (but frquently) timing out. 
-                    // May be connectivity in Brighton so remove when new connection on-line.
-                    httpClient.Timeout = TimeSpan.FromMinutes(5);
                     httpResponseMessage = httpClient.SendAsync(httpRequestMessage).Result;
                 }
 
