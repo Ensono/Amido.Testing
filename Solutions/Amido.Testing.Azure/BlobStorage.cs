@@ -179,6 +179,15 @@ namespace Amido.Testing.Azure
             var client = storageAccount.CreateCloudBlobClient();
 
             var blobContainer = client.GetContainerReference(containerSettings.ContainerName);
+            
+            try
+            {
+                blobContainer.FetchAttributes();
+            }
+            catch (StorageClientException ex)
+            {
+                return false;
+            }
 
             if (containerSettings.SubContainerName != null)
                 blobContainer = blobContainer.GetDirectoryReference(containerSettings.SubContainerName).Container;
