@@ -409,7 +409,14 @@ namespace Amido.Testing.Http
                     }
                 case RetryType.UntilBodyIncludes:
                     {
-                        if (httpResponseMessage.Content.ReadAsStringAsync().Result.Contains(retryParameter.ToString()))
+                        var result = httpResponseMessage.Content.ReadAsStringAsync().Result;
+                        var enumerableParameter = retryParameter as IEnumerable<object>;
+                        if (enumerableParameter != null)
+                        {
+                            if (enumerableParameter.All(p => result.Contains(p.ToString())))
+                                return true;
+                        }
+                        else if (result.Contains(retryParameter.ToString()))
                         {
                             return true;
                         }
@@ -417,7 +424,14 @@ namespace Amido.Testing.Http
                     }
                 case RetryType.UntilBodyDoesNotInclude:
                     {
-                        if (!httpResponseMessage.Content.ReadAsStringAsync().Result.Contains(retryParameter.ToString()))
+                        var result = httpResponseMessage.Content.ReadAsStringAsync().Result;
+                        var enumerableParameter = retryParameter as IEnumerable<object>;
+                        if (enumerableParameter != null)
+                        {
+                            if (!enumerableParameter.Any(p => result.Contains(p.ToString())))
+                                return true;
+                        }
+                        else if (!result.Contains(retryParameter.ToString()))
                         {
                             return true;
                         }
